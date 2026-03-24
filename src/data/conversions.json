@@ -1,0 +1,16 @@
+{
+  "pollo":      { "forno":   { "yield": 0.75 }, "padella": { "yield": 0.70 } },
+  "manzo":      { "forno":   { "yield": 0.70 }, "padella": { "yield": 0.72 } },
+  "maiale":     { "forno":   { "yield": 0.68 }, "padella": { "yield": 0.70 } },
+  "salmone":    { "forno":   { "yield": 0.80 }, "padella": { "yield": 0.78 } },
+  "tonno":      { "forno":   { "yield": 0.75 } },
+  "uova":       { "bollite": { "yield": 0.88 } },
+  "riso":       { "bollito": { "yield": 2.50 } },
+  "pasta":      { "bollita": { "yield": 2.20 } },
+  "lenticchie": { "bollite": { "yield": 2.30 } },
+  "zucchine":   { "padella": { "yield": 0.80 }, "bollite":  { "yield": 0.85 } },
+  "carote":     { "bollite": { "yield": 0.90 }, "forno":    { "yield": 0.85 } },
+  "patate":     { "forno":   { "yield": 0.75 }, "bollite":  { "yield": 0.90 } },
+  "spinaci":    { "padella": { "yield": 0.35 }, "bolliti":  { "yield": 0.30 } },
+  "broccoli":   { "bolliti": { "yield": 0.85 }, "forno":    { "yield": 0.80 } }
+}
