@@ -3,7 +3,7 @@ FROM node:20-slim
 
 # Dipendenze di sistema
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    openjdk-17-jdk-headless \
+    openjdk-21-jdk-headless \
     wget \
     unzip \
     && rm -rf /var/lib/apt/lists/*
