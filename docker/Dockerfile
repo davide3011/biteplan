@@ -1,11 +1,14 @@
 # ── Android SDK + Node (ambiente di build) ────────────────────────────────────
-FROM node:20-slim
+# eclipse-temurin:21 (Adoptium) su Ubuntu Jammy include Java 21
+FROM eclipse-temurin:21-jdk-jammy
 
-# Dipendenze di sistema
+# Installa Node.js 20 e dipendenze di sistema
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    openjdk-21-jdk-headless \
+    curl \
     wget \
     unzip \
+    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y --no-install-recommends nodejs \
     && rm -rf /var/lib/apt/lists/*
 
 # ── Android SDK ─────────────────────────────────────────────────────────────────
