@@ -51,6 +51,10 @@ RUN npm install @capacitor/core @capacitor/cli @capacitor/android --save
 
 RUN npx cap add android
 
+# ── Icone Android da assets/icon-only.png ────────────────────────────────────
+COPY assets/ ./assets/
+RUN npx @capacitor/assets generate --android
+
 # Fix kotlin-stdlib duplicate class conflict (stdlib 1.8+ already includes jdk7/jdk8)
 RUN printf '\nsubprojects {\n    configurations.all {\n        resolutionStrategy {\n            force "org.jetbrains.kotlin:kotlin-stdlib:1.8.22"\n            force "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.22"\n            force "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.22"\n        }\n    }\n}\n' >> android/build.gradle
 
