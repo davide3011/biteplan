@@ -1,8 +1,8 @@
 <template>
   <div class="page">
     <div class="page-header">
-      <h1 class="page-title">Pasti della settimana</h1>
-      <p class="page-subtitle">{{ todayLabel }}</p>
+      <h1 class="page-title">Piano Pasti</h1>
+      <p class="page-subtitle">{{ todayDate }}</p>
     </div>
     <MealCard
       v-for="day in days"
@@ -33,7 +33,7 @@ const days = [
 
 const todayMap = ['domenica', 'lunedi', 'martedi', 'mercoledi', 'giovedi', 'venerdi', 'sabato']
 const todayId = todayMap[new Date().getDay()]
-const todayLabel = days.find(d => d.id === todayId)?.label ?? ''
+const todayDate = 'Oggi, ' + new Date().toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' })
 
 const defaultMeals = () =>
   Object.fromEntries(days.map(d => [d.id, { colazione: [], pranzo: [], cena: [] }]))

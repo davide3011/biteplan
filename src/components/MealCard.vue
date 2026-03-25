@@ -56,7 +56,7 @@ const isOpen = ref(props.defaultOpen)
 
 const slots = [
   { id: 'colazione', label: 'Colazione', icon: '☀️' },
-  { id: 'pranzo',    label: 'Pranzo',    icon: '🌤️' },
+  { id: 'pranzo',    label: 'Pranzo',    icon: '🍽️' },
   { id: 'cena',      label: 'Cena',      icon: '🌙' },
 ]
 
