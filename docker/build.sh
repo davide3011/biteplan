@@ -29,6 +29,7 @@ if $FROM_HEAD; then
 else
   echo "==> Build Vite dalla working directory..."
   cd "$PROJECT_ROOT"
+  npm ci --silent
   npm run build --silent
 fi
 
