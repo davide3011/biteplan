@@ -7,6 +7,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     wget \
     unzip \
+    imagemagick \
     && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && apt-get install -y --no-install-recommends nodejs \
     && rm -rf /var/lib/apt/lists/*
@@ -51,9 +52,16 @@ RUN npm install @capacitor/core @capacitor/cli @capacitor/android --save
 
 RUN npx cap add android
 
-# ── Icone Android da assets/icon-only.png ────────────────────────────────────
+# ── Icone Android da assets/icon-only.png (via ImageMagick) ─────────────────
 COPY assets/ ./assets/
-RUN npx @capacitor/assets generate --android
+RUN for density in mdpi:48 hdpi:72 xhdpi:96 xxhdpi:144 xxxhdpi:192; do \
+      dir=$(echo $density | cut -d: -f1); \
+      size=$(echo $density | cut -d: -f2); \
+      convert assets/icon-only.png -resize ${size}x${size} \
+        android/app/src/main/res/mipmap-${dir}/ic_launcher.png; \
+      convert assets/icon-only.png -resize ${size}x${size} \
+        android/app/src/main/res/mipmap-${dir}/ic_launcher_round.png; \
+    done
 
 # Fix kotlin-stdlib duplicate class conflict (stdlib 1.8+ already includes jdk7/jdk8)
 RUN printf '\nsubprojects {\n    configurations.all {\n        resolutionStrategy {\n            force "org.jetbrains.kotlin:kotlin-stdlib:1.8.22"\n            force "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.22"\n            force "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.22"\n        }\n    }\n}\n' >> android/build.gradle
