@@ -10,7 +10,7 @@
 
       <div class="sheet-top">
         <div class="app-identity">
-          <div class="app-icon">B</div>
+          <img class="app-icon" :src="appIcon" alt="BitePlan" />
           <div>
             <div class="app-name">BitePlan</div>
             <div class="app-version">Versione {{ version }}</div>
@@ -50,6 +50,7 @@
 
 <script setup>
 import pkg from '../../package.json'
+import appIcon from '../../assets/icon-only.png'
 defineProps({ modelValue: Boolean })
 defineEmits(['update:modelValue'])
 const version = pkg.version
@@ -102,15 +103,8 @@ const version = pkg.version
 .app-icon {
   width: 48px;
   height: 48px;
-  background: var(--color-primary);
-  color: #fff;
   border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.4rem;
-  font-weight: 800;
-  letter-spacing: -0.02em;
+  object-fit: cover;
 }
 
 .app-name {
