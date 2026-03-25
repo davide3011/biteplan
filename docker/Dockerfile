@@ -51,6 +51,9 @@ RUN npm install @capacitor/core @capacitor/cli @capacitor/android --save
 
 RUN npx cap add android
 
+# Fix kotlin-stdlib duplicate class conflict (stdlib 1.8+ already includes jdk7/jdk8)
+RUN printf '\nsubprojects {\n    configurations.all {\n        resolutionStrategy {\n            force "org.jetbrains.kotlin:kotlin-stdlib:1.8.22"\n            force "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.22"\n            force "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.22"\n        }\n    }\n}\n' >> android/build.gradle
+
 # ── Runtime: dist/ viene montato come volume dall'host ────────────────────────
 # build.sh esegue: docker run -v ./dist:/app/dist ...
 # Qui cap sync copia dist/ in android/assets, poi Gradle builda l'APK
