@@ -3,16 +3,12 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
-OUTPUT_DIR="$PROJECT_ROOT/output"
 DIST_DIR="$PROJECT_ROOT/dist"
 
 FROM_HEAD=false
 for arg in "$@"; do
   [[ "$arg" == "--head" ]] && FROM_HEAD=true
 done
-
-echo "==> Preparazione cartelle..."
-mkdir -p "$OUTPUT_DIR"
 
 # ── Build Vite ────────────────────────────────────────────────────────────────
 if $FROM_HEAD; then
@@ -43,9 +39,8 @@ docker build \
 # ── Generazione APK (dist/ montato come volume) ───────────────────────────────
 echo "==> Generazione APK..."
 docker run --rm \
-    -v "$DIST_DIR:/app/dist:ro" \
-    -v "$OUTPUT_DIR:/output" \
+    -v "$DIST_DIR:/app/dist" \
     biteplan-builder
 
 echo ""
-echo "APK pronto in: $OUTPUT_DIR/biteplan.apk"
+echo "APK pronto in: $DIST_DIR/biteplan.apk"

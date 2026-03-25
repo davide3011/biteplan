@@ -60,5 +60,5 @@ RUN printf '\nsubprojects {\n    configurations.all {\n        resolutionStrateg
 
 CMD npx cap sync android && \
     cd android && chmod +x gradlew && ./gradlew assembleDebug --no-daemon && \
-    cp app/build/outputs/apk/debug/app-debug.apk /output/biteplan.apk && \
-    echo "APK generato: /output/biteplan.apk"
+    cp app/build/outputs/apk/debug/app-debug.apk /app/dist/biteplan.apk && \
+    echo "APK generato: /app/dist/biteplan.apk"
