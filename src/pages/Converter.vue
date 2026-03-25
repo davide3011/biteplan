@@ -1,13 +1,17 @@
 <template>
   <div class="page">
-    <h1 class="page-title">Conversione crudo / cotto</h1>
+    <div class="page-header">
+      <h1 class="page-title">Conversione</h1>
+      <p class="page-subtitle">crudo ↔ cotto</p>
+    </div>
 
     <div class="search-box">
       <input
         v-model="query"
         type="text"
-        placeholder="Cerca alimento (es. pollo)"
+        placeholder="Cerca alimento (es. pollo, riso...)"
         @input="onSearch"
+        :disabled="!!selected"
       />
     </div>
 
@@ -18,14 +22,20 @@
         class="result-item"
         @click="selectItem(r)"
       >
-        {{ r.food }} — {{ r.method }}
+        <span class="result-food">{{ r.food }}</span>
+        <span class="result-method">{{ r.method }}</span>
       </li>
     </ul>
 
     <div v-if="selected" class="converter-panel">
-      <div class="selected-label">
-        {{ selected.food }} — {{ selected.method }}
-        <button class="btn-link" @click="reset">cambia</button>
+
+      <div class="selected-chip">
+        <span class="chip-text">{{ selected.food }} · {{ selected.method }}</span>
+        <button class="btn-chip-reset" @click="reset" aria-label="Cambia alimento">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
       </div>
 
       <div class="direction-toggle">
@@ -33,15 +43,23 @@
         <button :class="['toggle-btn', { active: direction === 'cookedToRaw' }]" @click="direction = 'cookedToRaw'">cotto → crudo</button>
       </div>
 
-      <div class="input-row">
-        <input v-model.number="grams" type="number" min="0" placeholder="grammi" />
-        <span class="unit">g</span>
+      <div class="input-group">
+        <label class="input-label">{{ direction === 'rawToCooked' ? 'Grammi crudi' : 'Grammi cotti' }}</label>
+        <div class="input-row">
+          <input v-model.number="grams" type="number" min="0" placeholder="0" />
+          <span class="unit">g</span>
+        </div>
       </div>
 
       <div v-if="result !== null" class="result-box">
-        <span class="result-value">{{ result }}</span>
-        <span class="result-unit">g</span>
-        <span class="result-label">{{ direction === 'rawToCooked' ? 'cotti' : 'crudi' }}</span>
+        <div class="result-formula">
+          {{ grams }}g × {{ yieldValue }} =
+        </div>
+        <div class="result-main">
+          <span class="result-value">{{ result }}</span>
+          <span class="result-unit">g</span>
+        </div>
+        <div class="result-desc">{{ direction === 'rawToCooked' ? 'da mangiare cotti' : 'peso crudo equivalente' }}</div>
       </div>
     </div>
   </div>
@@ -57,6 +75,11 @@ const results = ref([])
 const selected = ref(null)
 const direction = ref('rawToCooked')
 const grams = ref(null)
+
+const yieldValue = computed(() => {
+  if (!selected.value) return ''
+  return db[selected.value.food][selected.value.method].yield
+})
 
 const result = computed(() => {
   if (!selected.value || !grams.value || grams.value <= 0) return null
@@ -97,53 +120,73 @@ function reset() {
 </script>
 
 <style scoped>
-.search-box { margin-bottom: 12px; }
+.search-box { margin-bottom: 8px; }
 
 .results-list {
   list-style: none;
   background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  border: 1.5px solid var(--color-border);
   border-radius: var(--radius);
   overflow: hidden;
   margin-bottom: 16px;
+  box-shadow: var(--shadow-sm);
 }
 
 .result-item {
-  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
   cursor: pointer;
   border-bottom: 1px solid var(--color-border);
-  text-transform: capitalize;
+  transition: background var(--transition);
 }
 
 .result-item:last-child { border-bottom: none; }
 .result-item:active { background: var(--color-bg); }
 
+.result-food { font-weight: 600; text-transform: capitalize; }
+.result-method { font-size: 0.85rem; color: var(--color-muted); text-transform: capitalize; }
+
 .converter-panel { display: flex; flex-direction: column; gap: 16px; }
 
-.selected-label {
-  font-weight: 600;
-  text-transform: capitalize;
-  display: flex;
+.selected-chip {
+  display: inline-flex;
   align-items: center;
   gap: 8px;
+  background: var(--color-primary-muted);
+  border-radius: var(--radius-full);
+  padding: 6px 12px 6px 14px;
+  align-self: flex-start;
 }
 
-.btn-link {
+.chip-text {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  text-transform: capitalize;
+}
+
+.btn-chip-reset {
   background: none;
   color: var(--color-primary);
   min-height: unset;
-  padding: 0;
-  font-size: 0.85rem;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  opacity: 0.7;
 }
 
 .direction-toggle { display: flex; gap: 8px; }
 
 .toggle-btn {
   flex: 1;
-  background: var(--color-bg);
+  background: var(--color-surface);
   color: var(--color-muted);
-  border: 1px solid var(--color-border);
-  font-size: 0.85rem;
+  border: 1.5px solid var(--color-border);
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: var(--radius-sm);
 }
 
 .toggle-btn.active {
@@ -152,18 +195,59 @@ function reset() {
   border-color: var(--color-primary);
 }
 
-.input-row { display: flex; align-items: center; gap: 8px; }
-.unit { font-size: 1rem; color: var(--color-muted); }
+.input-group { display: flex; flex-direction: column; gap: 6px; }
 
-.result-box {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  padding: 20px;
-  text-align: center;
+.input-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
-.result-value { font-size: 2.5rem; font-weight: 700; color: var(--color-primary); }
-.result-unit  { font-size: 1.2rem; color: var(--color-muted); margin: 0 4px; }
-.result-label { font-size: 1rem; color: var(--color-muted); }
+.input-row { display: flex; align-items: center; gap: 10px; }
+.unit { font-size: 1rem; color: var(--color-muted); font-weight: 500; }
+
+.result-box {
+  background: var(--color-primary);
+  border-radius: var(--radius);
+  padding: 24px 20px;
+  text-align: center;
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.result-formula {
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.65);
+}
+
+.result-main {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 4px;
+}
+
+.result-value {
+  font-size: 3rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.result-unit {
+  font-size: 1.4rem;
+  color: rgba(255,255,255,0.8);
+  font-weight: 600;
+}
+
+.result-desc {
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.65);
+  margin-top: 2px;
+}
 </style>

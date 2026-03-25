@@ -4,7 +4,11 @@
       <input type="checkbox" :checked="item.checked" @change="$emit('toggle')" />
       <span class="item-name">{{ item.name }}</span>
     </label>
-    <button class="btn-remove" @click="$emit('remove')">✕</button>
+    <button class="btn-remove" @click="$emit('remove')" :aria-label="`Rimuovi ${item.name}`">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
   </li>
 </template>
 
@@ -19,9 +23,17 @@ defineEmits(['toggle', 'remove'])
   align-items: center;
   justify-content: space-between;
   background: var(--color-surface);
-  border-radius: var(--radius);
-  padding: 12px 14px;
-  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 4px 4px 4px 14px;
+  border: 1.5px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+  transition: background var(--transition), border-color var(--transition);
+}
+
+.checkbox-item.checked {
+  background: var(--color-bg);
+  border-color: transparent;
+  box-shadow: none;
 }
 
 .item-label {
@@ -30,6 +42,7 @@ defineEmits(['toggle', 'remove'])
   gap: 12px;
   cursor: pointer;
   flex: 1;
+  padding: 8px 0;
 }
 
 input[type="checkbox"] {
@@ -37,10 +50,12 @@ input[type="checkbox"] {
   height: 20px;
   cursor: pointer;
   accent-color: var(--color-primary);
+  flex-shrink: 0;
 }
 
 .item-name {
   font-size: 1rem;
+  transition: color var(--transition);
 }
 
 .checked .item-name {
@@ -48,11 +63,19 @@ input[type="checkbox"] {
   color: var(--color-muted);
 }
 
+/* touch target pieno 44×44px */
 .btn-remove {
   background: none;
   color: var(--color-muted);
-  min-height: unset;
-  padding: 0 4px;
-  font-size: 0.8rem;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
 }
+
+.btn-remove:active { color: var(--color-danger); }
 </style>

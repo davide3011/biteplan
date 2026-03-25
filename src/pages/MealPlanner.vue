@@ -1,11 +1,15 @@
 <template>
   <div class="page">
-    <h1 class="page-title">Pasti della settimana</h1>
+    <div class="page-header">
+      <h1 class="page-title">Pasti della settimana</h1>
+      <p class="page-subtitle">{{ todayLabel }}</p>
+    </div>
     <MealCard
       v-for="day in days"
       :key="day.id"
       :day-name="day.label"
       :meals="meals[day.id]"
+      :default-open="day.id === todayId"
       @add="(slot, text) => addItem(day.id, slot, text)"
       @remove="(slot, idx) => removeItem(day.id, slot, idx)"
     />
@@ -26,6 +30,10 @@ const days = [
   { id: 'sabato',    label: 'Sabato'    },
   { id: 'domenica',  label: 'Domenica'  },
 ]
+
+const todayMap = ['domenica', 'lunedi', 'martedi', 'mercoledi', 'giovedi', 'venerdi', 'sabato']
+const todayId = todayMap[new Date().getDay()]
+const todayLabel = days.find(d => d.id === todayId)?.label ?? ''
 
 const defaultMeals = () =>
   Object.fromEntries(days.map(d => [d.id, { colazione: [], pranzo: [], cena: [] }]))
