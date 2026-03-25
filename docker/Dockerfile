@@ -52,15 +52,25 @@ RUN npm install @capacitor/core @capacitor/cli @capacitor/android --save
 
 RUN npx cap add android
 
+# ── Versione da package.json → android/app/build.gradle ──────────────────────
+RUN node -e "\
+      const v = require('./package.json').version; \
+      const [a,b,c] = v.split('.').map(Number); \
+      const vc = a*10000 + b*100 + c; \
+      const fs = require('fs'); \
+      let g = fs.readFileSync('android/app/build.gradle','utf8'); \
+      g = g.replace(/versionCode \d+/, 'versionCode '+vc); \
+      g = g.replace(/versionName \"[^\"]*\"/, 'versionName \"'+v+'\"'); \
+      fs.writeFileSync('android/app/build.gradle', g); \
+    "
+
 # ── Icone Android da assets/icon-only.png (via ImageMagick) ─────────────────
 COPY assets/ ./assets/
-RUN for density in mdpi:48 hdpi:72 xhdpi:96 xxhdpi:144 xxxhdpi:192; do \
-      dir=$(echo $density | cut -d: -f1); \
-      size=$(echo $density | cut -d: -f2); \
-      convert assets/icon-only.png -resize ${size}x${size} \
-        android/app/src/main/res/mipmap-${dir}/ic_launcher.png; \
-      convert assets/icon-only.png -resize ${size}x${size} \
-        android/app/src/main/res/mipmap-${dir}/ic_launcher_round.png; \
+RUN rm -rf android/app/src/main/res/mipmap-anydpi-v26 && \
+    for d in mdpi:48 hdpi:72 xhdpi:96 xxhdpi:144 xxxhdpi:192; do \
+      dest=android/app/src/main/res/mipmap-${d%:*}; \
+      convert assets/icon-only.png -resize ${d#*:}x${d#*:} $dest/ic_launcher.png; \
+      cp $dest/ic_launcher.png $dest/ic_launcher_round.png; \
     done
 
 # Fix kotlin-stdlib duplicate class conflict (stdlib 1.8+ already includes jdk7/jdk8)
