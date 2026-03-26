@@ -40,7 +40,7 @@ const showInfo = ref(false)
 
 .btn-info {
   position: fixed;
-  top: 14px;
+  top: calc(14px + env(safe-area-inset-top));
   right: 16px;
   /* centra rispetto al max-width del layout */
   max-width: calc(480px);
