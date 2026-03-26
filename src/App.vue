@@ -1,6 +1,6 @@
 <template>
   <div id="app-root">
-    <MealPlanner v-if="page === 'meal'" />
+    <MealPlanner v-if="page === 'meal'" @go-shop="page = 'shop'" />
     <Converter   v-else-if="page === 'convert'" />
     <ShoppingList v-else-if="page === 'shop'" />
     <BottomNav v-model="page" />
