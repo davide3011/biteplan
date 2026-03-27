@@ -7,6 +7,35 @@ il progetto aderisce al [Semantic Versioning](https://semver.org/lang/it/).
 
 ---
 
+## [0.9.1] — 2026-03-27
+
+### Aggiunto
+
+- **Guida utente in-app** — pannello documentazione integrato (DocsPanel): slide-from-right, navigazione a pill per sezione (Pasti, Converti, Spesa), IntersectionObserver per pill attiva durante lo scroll, card con step numerati e callout tip
+- **Suite di test** — 64 test automatici con Vitest + Playwright:
+  - Unit: `conversion.js` e `storage.js` con edge case
+  - Integration: Converter, MealPlanner, ShoppingList con Vue Test Utils
+  - E2E: navigazione, piano pasti, convertitore, lista della spesa con Playwright
+- **Script npm**: `test`, `test:coverage`, `test:e2e`, `test:e2e:ui`
+
+### Modificato
+
+- **InfoPanel** — il link esterno alla documentazione è sostituito dal pulsante "Guida" che apre DocsPanel in-app
+- **Convertitore** — nomi degli alimenti in sentence case (`capFirst`) anche nella lista risultati e nell'header della card (non solo i metodi)
+- **Convertitore** — simmetria visiva input/output: stesso underline `border-bottom` e stessa dimensione `1.6rem` per entrambe le colonne
+- **README** — aggiunta sezione "Requisiti per lo sviluppo" con versioni minime di Node.js, npm, Git e browser
+- **Icona app** — favicon e icona Android (round launcher) aggiornate a forma circolare con sfondo trasparente
+
+### Fix
+
+- **Convertitore** — rimosso CSS morto: doppio `align-items` in `.calc-output`, doppio `background` in `.btn-reset`, hack visibility globale su `.calc-unit`
+
+### Documentazione
+
+- **docs/guida-utente.md** — riscritta e allineata allo stato attuale dell'app (tab corrette, funzionalità aggiornate, friggitrice ad aria inclusa)
+
+---
+
 ## [0.9.0] — 2026-03-27
 
 ### Aggiunto
