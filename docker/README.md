@@ -25,7 +25,7 @@ bash docker/build.sh
 bash docker/build.sh --head
 ```
 
-L'APK viene generato in `output/biteplan.apk`.
+L'APK viene generato in `dist/biteplan.apk`.
 
 ## Prima build
 
@@ -37,7 +37,7 @@ Le build successive usano la cache Docker e sono molto più rapide.
 Con ADB:
 
 ```bash
-adb install output/biteplan.apk
+adb install dist/biteplan.apk
 ```
 
 ## Pipeline
