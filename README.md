@@ -1,12 +1,27 @@
 # BitePlan
 
-App mobile-first per la gestione della dieta quotidiana.
+App mobile-first per la gestione della dieta quotidiana — pianificazione pasti, conversione crudo/cotto e lista della spesa.
 
 ## Funzionalità
 
-- **Piano Pasti** — pianifica colazione, pranzo e cena per ogni giorno della settimana
-- **Convertitore crudo/cotto** — calcola il peso cotto a partire dal crudo (e viceversa) con coefficienti di resa per 14 alimenti
-- **Lista della spesa** — checklist con aggiunta, spunta e rimozione elementi
+### Piano Pasti
+- Pianificazione settimanale su 7 giorni × 3 pasti (colazione, pranzo, cena)
+- Card accordion per giorno, giorno corrente aperto di default
+- Aggiunta e rimozione di voci per ogni pasto
+- Generazione automatica della lista della spesa dai pasti pianificati
+- Persistenza automatica su LocalStorage
+
+### Convertitore crudo/cotto
+- Conversione bidirezionale del peso (crudo → cotto e cotto → crudo)
+- Ricerca alimento in tempo reale
+- Oltre 50 voci tra cereali, legumi, verdure, carni, pesce e uova
+- Fino a 4 metodi di cottura per alimento: bollitura, padella, forno, friggitrice ad aria
+- Coefficienti di resa documentati con fonti (CREA, SINU, Istituto Muzzone, USDA)
+
+### Lista della spesa
+- Checklist con aggiunta manuale o importazione dai pasti pianificati
+- Separazione visiva tra elementi da completare e completati
+- Rimozione singola e svuota lista con conferma
 
 ## Stack
 
@@ -26,16 +41,11 @@ npm run dev
 ```
 
 Aprire [http://localhost:5173](http://localhost:5173) in Chrome con DevTools in modalità mobile (viewport 360×640).
+Da un dispositivo mobile sulla stessa rete, aprire `http://<ip-host>:5173`.
 
 ## Build APK Android
 
-Richiede Docker su host **x86_64**.
-
-```bash
-bash docker/build.sh
-```
-
-L'APK viene generato in `dist/biteplan.apk`. Vedi [docker/README.md](docker/README.md) per i dettagli.
+Vedi [docker/README.md](docker/README.md) per i requisiti e i dettagli della pipeline.
 
 ## Documentazione
 
