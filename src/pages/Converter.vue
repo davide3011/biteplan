@@ -28,7 +28,7 @@
           @click="selectItem(r)"
         >
           <span class="result-food">{{ r.food }}</span>
-          <span class="result-method">{{ r.method }}</span>
+          <span class="result-method">{{ capFirst(r.method) }}</span>
         </li>
       </ul>
     </div>
@@ -39,7 +39,7 @@
         <div class="food-info">
           <span class="food-name">{{ selected.food }}</span>
           <span class="food-sep">·</span>
-          <span class="food-method">{{ selected.method }}</span>
+          <span class="food-method">{{ capFirst(selected.method) }}</span>
         </div>
         <button class="btn-reset" @click="reset" aria-label="Cambia alimento">
           Cambia
@@ -153,6 +153,10 @@ function reset() {
   direction.value = 'rawToCooked'
 }
 
+function capFirst(s) {
+  return s ? s.charAt(0).toUpperCase() + s.slice(1) : s
+}
+
 function swapDirection() {
   direction.value = direction.value === 'rawToCooked' ? 'cookedToRaw' : 'rawToCooked'
   grams.value = null
@@ -203,7 +207,7 @@ function swapDirection() {
 .result-item:last-child { border-bottom: none; }
 .result-item:active { background: var(--color-bg); }
 .result-food { font-weight: 600; text-transform: capitalize; }
-.result-method { font-size: 0.85rem; color: var(--color-muted); text-transform: capitalize; }
+.result-method { font-size: 0.85rem; color: var(--color-muted); }
 
 /* ── converter card ───────────────────────────────── */
 .converter-card {
@@ -225,10 +229,9 @@ function swapDirection() {
   display: flex;
   align-items: center;
   gap: 6px;
-  text-transform: capitalize;
 }
 
-.food-name { font-weight: 700; font-size: 1rem; }
+.food-name { font-weight: 700; font-size: 1rem; text-transform: capitalize; }
 .food-sep  { color: var(--color-border); font-size: 1.1rem; }
 .food-method { font-size: 0.9rem; color: var(--color-muted); }
 
