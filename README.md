@@ -33,6 +33,17 @@ App mobile-first per la gestione della dieta quotidiana — pianificazione pasti
 | Mobile | Capacitor Android |
 | Build APK | Docker |
 
+## Requisiti per lo sviluppo
+
+| Strumento | Versione minima | Note |
+|---|---|---|
+| Node.js | 18.x | |
+| npm | 9.x | incluso con Node.js |
+| Git | 2.x | |
+| Browser | Chrome / Edge / Firefox recente | DevTools modalità mobile consigliati |
+
+Per la build APK Android sono necessari requisiti aggiuntivi — vedi [docker/README.md](docker/README.md).
+
 ## Avvio in sviluppo
 
 ```bash
