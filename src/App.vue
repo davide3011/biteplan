@@ -14,7 +14,8 @@
       </svg>
     </button>
 
-    <InfoPanel v-model="showInfo" />
+    <InfoPanel v-model="showInfo" @open-docs="showDocs = true" />
+    <DocsPanel v-model="showDocs" />
   </div>
 </template>
 
@@ -22,12 +23,14 @@
 import { ref } from 'vue'
 import BottomNav    from './components/BottomNav.vue'
 import InfoPanel    from './components/InfoPanel.vue'
+import DocsPanel    from './components/DocsPanel.vue'
 import MealPlanner  from './pages/MealPlanner.vue'
 import Converter    from './pages/Converter.vue'
 import ShoppingList from './pages/ShoppingList.vue'
 
-const page = ref('meal')
+const page     = ref('meal')
 const showInfo = ref(false)
+const showDocs = ref(false)
 </script>
 
 <style scoped>

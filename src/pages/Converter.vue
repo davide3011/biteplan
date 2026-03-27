@@ -27,7 +27,7 @@
           class="result-item"
           @click="selectItem(r)"
         >
-          <span class="result-food">{{ r.food }}</span>
+          <span class="result-food">{{ capFirst(r.food) }}</span>
           <span class="result-method">{{ capFirst(r.method) }}</span>
         </li>
       </ul>
@@ -37,7 +37,7 @@
     <div v-if="selected" class="converter-card">
       <div class="card-top">
         <div class="food-info">
-          <span class="food-name">{{ selected.food }}</span>
+          <span class="food-name">{{ capFirst(selected.food) }}</span>
           <span class="food-sep">·</span>
           <span class="food-method">{{ capFirst(selected.method) }}</span>
         </div>
@@ -64,7 +64,7 @@
           </div>
         </div>
 
-        <button class="btn-swap" @click="swapDirection" :title="direction === 'rawToCooked' ? 'Inverti direzione' : 'Inverti direzione'">
+        <button class="btn-swap" @click="swapDirection" aria-label="Inverti direzione">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="17 1 21 5 17 9"/>
             <path d="M3 11V9a4 4 0 014-4h14"/>
@@ -73,12 +73,12 @@
           </svg>
         </button>
 
-        <div class="calc-side output-side" :class="{ 'has-result': result !== null }">
+        <div class="calc-side output-side">
           <div class="calc-label">{{ direction === 'rawToCooked' ? 'cotto' : 'crudo' }}</div>
           <div class="calc-output">
             <span v-if="result !== null" class="output-value">{{ result }}</span>
             <span v-else class="output-placeholder">—</span>
-            <span class="calc-unit" :class="{ visible: result !== null }">g</span>
+            <span v-if="result !== null" class="calc-unit">g</span>
           </div>
         </div>
       </div>
@@ -206,7 +206,7 @@ function swapDirection() {
 
 .result-item:last-child { border-bottom: none; }
 .result-item:active { background: var(--color-bg); }
-.result-food { font-weight: 600; text-transform: capitalize; }
+.result-food { font-weight: 600; }
 .result-method { font-size: 0.85rem; color: var(--color-muted); }
 
 /* ── converter card ───────────────────────────────── */
@@ -231,12 +231,11 @@ function swapDirection() {
   gap: 6px;
 }
 
-.food-name { font-weight: 700; font-size: 1rem; text-transform: capitalize; }
+.food-name { font-weight: 700; font-size: 1rem; }
 .food-sep  { color: var(--color-border); font-size: 1.1rem; }
 .food-method { font-size: 0.9rem; color: var(--color-muted); }
 
 .btn-reset {
-  background: none;
   color: var(--color-primary);
   font-size: 0.85rem;
   font-weight: 600;
@@ -284,7 +283,7 @@ function swapDirection() {
 
 /* override globale per input dentro la card */
 .calc-input {
-  font-size: 1.5rem;
+  font-size: 1.6rem;
   font-weight: 700;
   letter-spacing: -0.02em;
   border: none;
@@ -308,6 +307,8 @@ function swapDirection() {
   font-size: 1rem;
   font-weight: 600;
   color: var(--color-muted);
+  align-self: flex-end;
+  padding-bottom: 6px;
 }
 
 /* bottone swap centrale */
@@ -332,32 +333,30 @@ function swapDirection() {
   opacity: 1;
 }
 
-/* colonna output */
-.output-side .calc-output {
+/* colonna output: underline visivo per simmetria con il lato input */
+.calc-output {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 4px;
   min-height: 44px;
-  align-items: center;
+  border-bottom: 2px solid var(--color-border);
+  padding-bottom: 4px;
 }
 
 .output-value {
-  font-size: 2rem;
+  font-size: 1.6rem;
   font-weight: 800;
   letter-spacing: -0.03em;
   color: var(--color-primary);
+  line-height: 1;
 }
 
 .output-placeholder {
-  font-size: 2rem;
+  font-size: 1.6rem;
   font-weight: 300;
   color: var(--color-border);
+  line-height: 1;
 }
-
-/* nasconde "g" finché non c'è un risultato */
-.calc-unit { visibility: hidden; }
-.calc-input-wrap .calc-unit,
-.has-result .calc-unit { visibility: visible; }
 
 /* ── footer card ─────────────────────────────────── */
 .card-footer {
