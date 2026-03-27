@@ -7,6 +7,33 @@ il progetto aderisce al [Semantic Versioning](https://semver.org/lang/it/).
 
 ---
 
+## [0.9.0] — 2026-03-27
+
+### Aggiunto
+
+- **Piano Pasti** — bottone "Genera lista della spesa": raccoglie tutti gli item dalla settimana, deduplica (case-insensitive), salta quelli già presenti e naviga automaticamente alla tab Lista della spesa
+- **Convertitore** — espanso il database da 14 a oltre 50 voci; aggiunto supporto friggitrice ad aria per carni, pesce, verdure e tuberi
+- **Verdure** — aggiunte 16 nuove voci (spinaci, bieta, broccoli, cavolfiore, fagiolini, asparagi, carciofi, finocchi, porri, verza, cavolo cappuccio, cicoria coltivata, cicoria di campo, cavolini di Bruxelles, rape, agretti)
+- **Metodi di cottura verdure** — ogni verdura copre ora tutti i metodi applicabili: bollitura, padella, forno, friggitrice ad aria
+- Server Vite esposto sulla rete locale (`--host`): accessibile da dispositivi mobili via `http://<ip>:5173`
+
+### Modificato
+
+- **Convertitore** — coefficienti di resa aggiornati con dati reali da fonti ufficiali (CREA/alimentinutrizione.it, SINU, Istituto Muzzone, AEMMEDI, USDA FNDDS); sostituiti tutti i valori placeholder
+- **docs/conversioni.md** — metodologia documentata per derivazione yield da kcal CREA e da USDA FNDDS per cottura in padella; fonti verificate e collegate per ogni valore
+
+### Fix
+
+- Bottone info (`ⓘ`) posizionato sotto `env(safe-area-inset-top)`: non finisce più sotto la status bar su dispositivi con notch
+- Convertitore — metodo di cottura ora in sentence case ("Friggitrice ad aria" invece di "Friggitrice Ad Aria")
+- `docker/README.md` — percorso APK corretto da `output/` a `dist/`
+
+### Documentazione
+
+- README riscritto con funzionalità dettagliate e nota accesso da mobile
+
+---
+
 ## [0.1.0-alpha] — 2026-03-25
 
 Prima versione alpha dell'app BitePlan.
