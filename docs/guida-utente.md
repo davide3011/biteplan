@@ -4,21 +4,21 @@
 
 BitePlan è organizzata in tre sezioni accessibili dalla barra in basso:
 
-| Icona | Sezione | Funzione |
+| Icona | Tab | Funzione |
 |---|---|---|
-| Calendario | Piano Pasti | Pianifica i pasti della settimana |
-| Bilancia | Convertitore | Converti peso crudo/cotto |
-| Lista | Lista della spesa | Gestisci la spesa |
+| Calendario | Pasti | Pianifica i pasti della settimana |
+| Frecce | Converti | Converti peso crudo/cotto |
+| Carrello | Spesa | Gestisci la lista della spesa |
 
 ---
 
-## Piano Pasti
+## Pasti
 
-La sezione mostra i sette giorni della settimana. Il giorno corrente è aperto di default.
+La sezione mostra i sette giorni della settimana. Il giorno corrente è espanso di default.
 
 ### Aggiungere un alimento
 
-1. Tocca il giorno per espandere la card
+1. Tocca il giorno per espandere la card (se non è già aperta)
 2. Vai al pasto desiderato (Colazione, Pranzo o Cena)
 3. Scrivi il nome dell'alimento nel campo di testo
 4. Premi **+** o il tasto Invio per aggiungerlo
@@ -27,43 +27,60 @@ La sezione mostra i sette giorni della settimana. Il giorno corrente è aperto d
 
 Tocca il pulsante **×** a destra dell'elemento.
 
+### Generare la lista della spesa
+
+Premi il pulsante **Genera lista della spesa** in fondo alla pagina. Tutti gli alimenti pianificati vengono aggiunti alla lista della spesa, senza duplicati rispetto a quelli già presenti. L'app passa automaticamente alla tab Spesa.
+
 ### Persistenza
 
-I dati vengono salvati automaticamente sul dispositivo (LocalStorage). Non è necessario premere nessun pulsante di salvataggio.
+I dati vengono salvati automaticamente sul dispositivo. Non è necessario premere nessun pulsante di salvataggio.
 
 ---
 
-## Convertitore crudo/cotto
+## Converti
 
-Calcola il peso cotto a partire dal crudo, o viceversa, in base ai coefficienti di resa di ogni alimento.
+Calcola il peso cotto a partire dal crudo, o viceversa, in base ai coefficienti di resa di ogni alimento e metodo di cottura.
 
 ### Utilizzo
 
-1. Cerca l'alimento nel campo di ricerca (es. `pollo`, `riso`)
-2. Seleziona il metodo di cottura dall'elenco risultati
-3. Scegli la direzione: **Crudo → Cotto** o **Cotto → Crudo** (pulsante swap)
-4. Inserisci il peso in grammi
-5. Il risultato appare in tempo reale
+1. Cerca l'alimento nel campo di ricerca (es. `pollo`, `riso`, `zucchine`)
+2. Seleziona dall'elenco la combinazione alimento + metodo di cottura
+3. Inserisci il peso in grammi
+4. Il risultato appare in tempo reale
+5. Per invertire la direzione (cotto → crudo), premi il pulsante **⇄** al centro
 
-### Alimenti disponibili
+### Alimenti e metodi disponibili
 
-Proteine: pollo, manzo, maiale, salmone, tonno, uova
-Carboidrati: riso, pasta, lenticchie
-Verdure: zucchine, carote, patate, spinaci, broccoli
+Il database copre oltre 50 voci suddivise per categoria:
 
-Per l'elenco completo con metodi di cottura e coefficienti, vedi [conversioni.md](conversioni.md).
+| Categoria | Esempi |
+|---|---|
+| Cereali e pasta | Riso (4 varietà), pasta, farro, orzo, quinoa, cous cous |
+| Legumi secchi | Ceci, fagioli, lenticchie |
+| Verdure | Carote, zucchine, patate, spinaci, broccoli, cavolfiore, asparagi, carciofi, finocchi e altri |
+| Carni | Pollo petto, tacchino fesa, hamburger, vitello |
+| Pesce | Tonno, merluzzo, spigola, sogliola |
+| Uova | Uovo al tegamino, frittata |
+
+I metodi di cottura disponibili variano per alimento: **bollitura**, **padella**, **forno**, **friggitrice ad aria**.
+
+Per l'elenco completo con coefficienti e fonti, vedi [conversioni.md](conversioni.md).
 
 ---
 
-## Lista della spesa
+## Spesa
 
 ### Aggiungere un elemento
 
 Scrivi il nome nel campo in alto e premi **+** o Invio.
 
+### Importare dal piano pasti
+
+Vai alla tab **Pasti** e premi **Genera lista della spesa** — gli alimenti pianificati vengono aggiunti automaticamente.
+
 ### Spuntare un elemento
 
-Tocca la casella a sinistra dell'elemento. Gli elementi completati vengono spostati in fondo con testo barrato.
+Tocca la casella a sinistra dell'elemento. Gli elementi completati vengono spostati in una sezione separata con testo barrato.
 
 ### Rimuovere un elemento
 
