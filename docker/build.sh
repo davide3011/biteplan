@@ -59,6 +59,7 @@ docker build \
 
 # ── Generazione APK ───────────────────────────────────────────────────────────
 echo "==> Generazione APK${RELEASE:+ release}..."
+mkdir -p "$PROJECT_ROOT/dist"
 
 DOCKER_ARGS=(
   --rm
