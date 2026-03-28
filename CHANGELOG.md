@@ -7,6 +7,26 @@ il progetto aderisce al [Semantic Versioning](https://semver.org/lang/it/).
 
 ---
 
+## [1.0.0] — 2026-03-28
+
+### Aggiunto
+
+- **Build APK release firmato** — pipeline Docker aggiornata con supporto
+  `assembleRelease` + `zipalign` + `apksigner`; flag `--release` in `build.sh`
+  per attivare la firma; keystore montato come volume read-only (mai nell'immagine)
+- **`build.sh --release`** — chiede interattivamente le password del keystore;
+  supporta override via `KEYSTORE_PASS`, `KEY_PASS`, `KEYSTORE_PATH`
+- **Flag combinabili** — `--head` e `--release` ora combinabili in qualsiasi ordine
+
+### Fix
+
+- `build.sh --head` — APK ora copiato in `dist/` del progetto invece di andare
+  perso nella directory temporanea cancellata dal trap EXIT
+- `build.sh` — `dist/` creata con `mkdir -p` prima del `docker run` per evitare
+  ownership root che causava "Permission denied" nelle build successive
+
+---
+
 ## [0.9.1] — 2026-03-27
 
 ### Aggiunto
