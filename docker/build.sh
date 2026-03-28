@@ -76,5 +76,11 @@ fi
 
 docker run "${DOCKER_ARGS[@]}" biteplan-builder
 
+# Con --head l'APK è nella dir temporanea — copiarlo in dist/ del progetto
+if $FROM_HEAD; then
+  mkdir -p "$PROJECT_ROOT/dist"
+  cp "$DIST_DIR/biteplan.apk" "$PROJECT_ROOT/dist/biteplan.apk"
+fi
+
 echo ""
-echo "APK pronto in: $DIST_DIR/biteplan.apk"
+echo "APK pronto in: $PROJECT_ROOT/dist/biteplan.apk"
