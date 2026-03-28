@@ -6,9 +6,30 @@ PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 DIST_DIR="$PROJECT_ROOT/dist"
 
 FROM_HEAD=false
+RELEASE=false
 for arg in "$@"; do
-  [[ "$arg" == "--head" ]] && FROM_HEAD=true
+  [[ "$arg" == "--head"    ]] && FROM_HEAD=true
+  [[ "$arg" == "--release" ]] && RELEASE=true
 done
+
+# ── Keystore (solo in modalità release) ───────────────────────────────────────
+KEYSTORE_PATH="${KEYSTORE_PATH:-$SCRIPT_DIR/biteplan.jks}"
+
+if $RELEASE; then
+  if [[ ! -f "$KEYSTORE_PATH" ]]; then
+    echo "Errore: keystore non trovato in $KEYSTORE_PATH"
+    echo "Generalo con:"
+    echo "  keytool -genkey -v -keystore docker/biteplan.jks -alias biteplan -keyalg RSA -keysize 2048 -validity 10000"
+    exit 1
+  fi
+
+  if [[ -z "${KEYSTORE_PASS:-}" ]]; then
+    read -rsp "Password keystore: " KEYSTORE_PASS; echo
+  fi
+  if [[ -z "${KEY_PASS:-}" ]]; then
+    read -rsp "Password chiave:   " KEY_PASS; echo
+  fi
+fi
 
 # ── Build Vite ────────────────────────────────────────────────────────────────
 if $FROM_HEAD; then
@@ -36,11 +57,24 @@ docker build \
     -t biteplan-builder \
     "$PROJECT_ROOT"
 
-# ── Generazione APK (dist/ montato come volume) ───────────────────────────────
-echo "==> Generazione APK..."
-docker run --rm \
-    -v "$DIST_DIR:/app/dist" \
-    biteplan-builder
+# ── Generazione APK ───────────────────────────────────────────────────────────
+echo "==> Generazione APK${RELEASE:+ release}..."
+
+DOCKER_ARGS=(
+  --rm
+  -v "$DIST_DIR:/app/dist"
+)
+
+if $RELEASE; then
+  DOCKER_ARGS+=(
+    -e BUILD_TYPE=release
+    -e KEYSTORE_PASS="$KEYSTORE_PASS"
+    -e KEY_PASS="$KEY_PASS"
+    -v "$KEYSTORE_PATH:/app/biteplan.jks:ro"
+  )
+fi
+
+docker run "${DOCKER_ARGS[@]}" biteplan-builder
 
 echo ""
 echo "APK pronto in: $DIST_DIR/biteplan.apk"

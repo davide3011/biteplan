@@ -76,11 +76,29 @@ RUN rm -rf android/app/src/main/res/mipmap-anydpi-v26 && \
 # Fix kotlin-stdlib duplicate class conflict (stdlib 1.8+ already includes jdk7/jdk8)
 RUN printf '\nsubprojects {\n    configurations.all {\n        resolutionStrategy {\n            force "org.jetbrains.kotlin:kotlin-stdlib:1.8.22"\n            force "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.22"\n            force "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.22"\n        }\n    }\n}\n' >> android/build.gradle
 
-# ── Runtime: dist/ viene montato come volume dall'host ────────────────────────
+# ── Runtime: dist/ e (opzionale) keystore montati come volumi dall'host ───────
 # build.sh esegue: docker run -v ./dist:/app/dist ...
-# Qui cap sync copia dist/ in android/assets, poi Gradle builda l'APK
+# Con --release: aggiunge -e BUILD_TYPE=release -v biteplan.jks:/app/biteplan.jks:ro
+# BUILD_TYPE=release → assembleRelease + zipalign + apksigner
+# BUILD_TYPE vuoto   → assembleDebug (default)
 
 CMD npx cap sync android && \
-    cd android && chmod +x gradlew && ./gradlew assembleDebug --no-daemon && \
-    cp app/build/outputs/apk/debug/app-debug.apk /app/dist/biteplan.apk && \
-    echo "APK generato: /app/dist/biteplan.apk"
+    cd android && chmod +x gradlew && \
+    if [ "$BUILD_TYPE" = "release" ]; then \
+      ./gradlew assembleRelease --no-daemon && \
+      $ANDROID_HOME/build-tools/34.0.0/zipalign -v 4 \
+        app/build/outputs/apk/release/app-release-unsigned.apk \
+        /tmp/aligned.apk && \
+      $ANDROID_HOME/build-tools/34.0.0/apksigner sign \
+        --ks /app/biteplan.jks \
+        --ks-key-alias biteplan \
+        --ks-pass pass:$KEYSTORE_PASS \
+        --key-pass pass:$KEY_PASS \
+        --out /app/dist/biteplan.apk \
+        /tmp/aligned.apk && \
+      echo "APK release firmato: /app/dist/biteplan.apk"; \
+    else \
+      ./gradlew assembleDebug --no-daemon && \
+      cp app/build/outputs/apk/debug/app-debug.apk /app/dist/biteplan.apk && \
+      echo "APK debug: /app/dist/biteplan.apk"; \
+    fi
