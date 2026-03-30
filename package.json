@@ -12,6 +12,8 @@
     "test:e2e:ui": "playwright test --ui"
   },
   "dependencies": {
+    "jsqr": "^1.4.0",
+    "qrcode": "^1.5.4",
     "vue": "^3.4.0"
   },
   "devDependencies": {
