@@ -37,7 +37,7 @@ App mobile-first per la gestione della dieta quotidiana — pianificazione pasti
 
 | Strumento | Versione minima | Note |
 |---|---|---|
-| Node.js | 18.x | |
+| Node.js | >= 20.x LTS | testato con v24 |
 | npm | 9.x | incluso con Node.js |
 | Git | 2.x | |
 | Browser | Chrome / Edge / Firefox recente | DevTools modalità mobile consigliati |
