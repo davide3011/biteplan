@@ -52,6 +52,10 @@ RUN npm install @capacitor/core @capacitor/cli @capacitor/android --save
 
 RUN npx cap add android
 
+# ── Permessi Android ──────────────────────────────────────────────────────────
+RUN sed -i 's|</manifest>|    <uses-permission android:name="android.permission.CAMERA" />\n</manifest>|' \
+    android/app/src/main/AndroidManifest.xml
+
 # ── Versione da package.json → android/app/build.gradle ──────────────────────
 RUN node -e "\
       const v = require('./package.json').version; \
