@@ -31,6 +31,16 @@ Tocca il pulsante **×** a destra dell'elemento.
 
 Premi il pulsante **Genera lista della spesa** in fondo alla pagina. Tutti gli alimenti pianificati vengono aggiunti alla lista della spesa, senza duplicati rispetto a quelli già presenti. L'app passa automaticamente alla tab Spesa.
 
+### Condividere il piano con un altro dispositivo
+
+1. Premi **Condividi** in fondo alla pagina — viene generato un QR code con l'intero piano settimanale
+2. Sull'altro dispositivo apri BitePlan, vai alla tab **Pasti** e premi **Scansiona QR**
+3. Inquadra il codice con la fotocamera — il piano viene importato automaticamente
+
+> **Nota:** il dispositivo che scansiona deve concedere il permesso di accesso alla fotocamera quando richiesto.
+
+> **Limite:** se il piano contiene un numero molto elevato di alimenti, il QR code potrebbe non essere generabile. In quel caso riduci le voci inserite.
+
 ### Persistenza
 
 I dati vengono salvati automaticamente sul dispositivo. Non è necessario premere nessun pulsante di salvataggio.

@@ -68,6 +68,24 @@
           </div>
 
           <div class="doc-card">
+            <h3 class="card-title">Condividere il piano</h3>
+            <ol class="steps">
+              <li>Premi <strong>Condividi</strong> in fondo alla pagina</li>
+              <li>Viene generato un QR code con l'intero piano settimanale</li>
+              <li>Fai scansionare il codice dall'altro dispositivo</li>
+            </ol>
+          </div>
+
+          <div class="doc-card">
+            <h3 class="card-title">Ricevere un piano</h3>
+            <ol class="steps">
+              <li>Premi <strong>Scansiona QR</strong> in fondo alla pagina</li>
+              <li>Consenti l'accesso alla fotocamera quando richiesto</li>
+              <li>Inquadra il QR code — il piano viene importato automaticamente</li>
+            </ol>
+          </div>
+
+          <div class="doc-card">
             <h3 class="card-title">Salvataggio automatico</h3>
             <p>I dati vengono salvati automaticamente sul dispositivo. Non serve premere nessun tasto.</p>
           </div>

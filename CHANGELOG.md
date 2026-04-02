@@ -7,6 +7,20 @@ il progetto aderisce al [Semantic Versioning](https://semver.org/lang/it/).
 
 ---
 
+## [1.1.0] — 2026-04-02
+
+### Aggiunto
+
+- **Condivisione piano pasti via QR code** — pulsante "Condividi" nel Piano Pasti genera un QR code che codifica l'intero piano settimanale; un altro dispositivo può scansionarlo per importare il piano
+- **Guida utente aggiornata** — aggiunte sezioni "Condividere il piano" e "Ricevere un piano" nella guida in-app (DocsPanel) e nel file `docs/guida-utente.md`
+
+### Fix
+
+- **AndroidManifest** — aggiunto permesso `CAMERA` necessario per la scansione del QR code nei build generati da Capacitor
+- **Dipendenze** — risolte 6 vulnerabilità npm aggiornando `vite` e `vitest` alle versioni più recenti
+
+---
+
 ## [1.0.0] — 2026-03-28
 
 ### Aggiunto
