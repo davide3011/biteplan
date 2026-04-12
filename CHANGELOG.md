@@ -7,6 +7,14 @@ il progetto aderisce al [Semantic Versioning](https://semver.org/lang/it/).
 
 ---
 
+## [1.2.1] — 2026-04-12
+
+### Fix
+
+- **Orientamento bloccato in portrait** — l'app rimane sempre verticale indipendentemente dalla rotazione fisica del dispositivo; su APK via `android:screenOrientation="portrait"` nel manifest, su browser mobile via counter-rotate CSS dinamico
+
+---
+
 ## [1.2.0] — 2026-04-12
 
 ### Aggiunto
