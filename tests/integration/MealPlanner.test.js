@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { nextTick } from 'vue'
 import MealPlanner from '../../src/pages/MealPlanner.vue'
@@ -148,5 +148,43 @@ describe('MealPlanner — genera lista della spesa', () => {
     const w = mountPlanner()
     await w.find('.btn-generate').trigger('click')
     expect(load('shopping', [])).toHaveLength(0)
+  })
+})
+
+describe('MealPlanner — svuota piano', () => {
+  it('non mostra il pulsante se il piano è vuoto', () => {
+    const w = mountPlanner()
+    expect(w.find('.btn-clear').exists()).toBe(false)
+  })
+
+  it('mostra il pulsante se c\'è almeno un pasto', () => {
+    seedMeals({ lunedi: { colazione: ['caffè'], pranzo: [], cena: [] } })
+    const w = mountPlanner()
+    expect(w.find('.btn-clear').exists()).toBe(true)
+  })
+
+  it('svuota il piano dopo conferma', async () => {
+    vi.spyOn(window, 'confirm').mockReturnValue(true)
+    seedMeals({ lunedi: { colazione: ['caffè'], pranzo: ['pasta'], cena: [] } })
+    const w = mountPlanner()
+
+    await w.find('.btn-clear').trigger('click')
+    await nextTick()
+
+    const saved = load('meals', {})
+    expect(saved.lunedi.colazione).toHaveLength(0)
+    expect(saved.lunedi.pranzo).toHaveLength(0)
+    expect(w.find('.btn-clear').exists()).toBe(false)
+  })
+
+  it('non svuota se l\'utente annulla', async () => {
+    vi.spyOn(window, 'confirm').mockReturnValue(false)
+    seedMeals({ lunedi: { colazione: ['caffè'], pranzo: [], cena: [] } })
+    const w = mountPlanner()
+
+    await w.find('.btn-clear').trigger('click')
+    await nextTick()
+
+    expect(load('meals', {}).lunedi.colazione).toHaveLength(1)
   })
 })

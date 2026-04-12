@@ -22,6 +22,8 @@
       Genera lista della spesa
     </button>
 
+    <button v-if="hasMeals" class="btn-clear" @click="clearAll">Svuota piano</button>
+
     <div class="btn-share-row">
       <button class="btn-share" @click="openShare">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -99,7 +101,7 @@
 </template>
 
 <script setup>
-import { reactive, watch, ref, onUnmounted, nextTick } from 'vue'
+import { reactive, watch, ref, computed, onUnmounted, nextTick } from 'vue'
 import MealCard from '../components/MealCard.vue'
 import { save, load } from '../utils/storage.js'
 import QRCode from 'qrcode'
@@ -135,6 +137,14 @@ function addItem(day, slot, text) {
 
 function removeItem(day, slot, idx) {
   meals[day][slot].splice(idx, 1)
+}
+
+const hasMeals = computed(() =>
+  days.some(d => ['colazione', 'pranzo', 'cena'].some(s => meals[d.id][s].length > 0))
+)
+
+function clearAll() {
+  if (confirm('Svuotare tutto il piano settimanale?')) Object.assign(meals, defaultMeals())
 }
 
 function generateShopping() {

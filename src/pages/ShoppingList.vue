@@ -144,21 +144,6 @@ function clearAll() {
   background: var(--color-border);
 }
 
-/* bottone distruttivo in ghost style — meno aggressivo del solid rosso */
-.btn-clear {
-  width: 100%;
-  background: transparent;
-  color: var(--color-danger);
-  border: 1.5px solid var(--color-danger);
-  margin-top: 16px;
-  font-weight: 600;
-}
-
-.btn-clear:active {
-  background: var(--color-danger-muted);
-  opacity: 1;
-}
-
 .empty-state {
   display: flex;
   flex-direction: column;
