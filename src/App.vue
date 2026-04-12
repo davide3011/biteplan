@@ -16,11 +16,12 @@
 
     <InfoPanel v-model="showInfo" @open-docs="showDocs = true" />
     <DocsPanel v-model="showDocs" />
+
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import BottomNav    from './components/BottomNav.vue'
 import InfoPanel    from './components/InfoPanel.vue'
 import DocsPanel    from './components/DocsPanel.vue'
@@ -31,6 +32,47 @@ import ShoppingList from './pages/ShoppingList.vue'
 const page     = ref('meal')
 const showInfo = ref(false)
 const showDocs = ref(false)
+
+function fixOrientation() {
+  const isLandscape = window.innerWidth > window.innerHeight
+  // screen.orientation.angle potrebbe non essere ancora aggiornato o non disponibile:
+  // fallback basato su dimensioni finestra
+  const angle = screen.orientation?.angle ?? (isLandscape ? 90 : 0)
+  const root = document.getElementById('app-root')
+  if (!root) return
+  if (isLandscape) {
+    const w = window.innerWidth
+    const h = window.innerHeight
+    root.style.cssText = `
+      position: fixed;
+      width: ${h}px;
+      height: ${w}px;
+      top: ${(h - w) / 2}px;
+      left: ${(w - h) / 2}px;
+      transform: rotate(${angle === 90 ? -90 : 90}deg);
+      transform-origin: center center;
+    `
+  } else {
+    root.style.cssText = ''
+  }
+}
+
+// orientationchange si triggera prima che angle/dimensioni siano aggiornati:
+// aspettiamo un tick
+function onOrientationChange() {
+  setTimeout(fixOrientation, 50)
+}
+
+onMounted(() => {
+  fixOrientation()
+  window.addEventListener('orientationchange', onOrientationChange)
+  window.addEventListener('resize', fixOrientation)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('orientationchange', onOrientationChange)
+  window.removeEventListener('resize', fixOrientation)
+})
 </script>
 
 <style scoped>
@@ -67,4 +109,5 @@ const showDocs = ref(false)
   box-shadow: var(--shadow-md);
   opacity: 1;
 }
+
 </style>

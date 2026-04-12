@@ -56,6 +56,10 @@ RUN npx cap add android
 RUN sed -i 's|</manifest>|    <uses-permission android:name="android.permission.CAMERA" />\n</manifest>|' \
     android/app/src/main/AndroidManifest.xml
 
+# ── Orientamento bloccato in portrait ────────────────────────────────────────
+RUN sed -i 's/android:exported="true"/android:exported="true"\n        android:screenOrientation="portrait"/' \
+    android/app/src/main/AndroidManifest.xml
+
 # ── Versione da package.json → android/app/build.gradle ──────────────────────
 RUN node -e "\
       const v = require('./package.json').version; \
