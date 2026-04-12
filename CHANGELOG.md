@@ -7,6 +7,22 @@ il progetto aderisce al [Semantic Versioning](https://semver.org/lang/it/).
 
 ---
 
+## [1.2.0] — 2026-04-12
+
+### Aggiunto
+
+- **Pulsante "Svuota piano"** — nel Piano Pasti, compare un pulsante per azzerare l'intera settimana con richiesta di conferma (analogo al "Svuota lista" della spesa); visibile solo quando è presente almeno un pasto
+
+### Modificato
+
+- **`.btn-clear`** — stile spostato da `ShoppingList.vue` (scoped) a `style.css` (globale), condiviso tra Piano Pasti e Lista della spesa
+
+### Fix
+
+- **Dipendenze** — aggiornato `vite` a 6.4.2 (CVE path traversal e arbitrary file read sul dev server)
+
+---
+
 ## [1.1.0] — 2026-04-02
 
 ### Aggiunto
