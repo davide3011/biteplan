@@ -8,32 +8,43 @@ BitePlan è un'app Android per meal planning, conversione crudo/cotto e lista de
 
 ## Stato attuale
 
-Il codice Vue 3 esistente (`src/`, `tests/`, `vite.config.mjs`, ecc.) è il riferimento funzionale da portare in Flutter — non va esteso. Il nuovo codice Flutter va creato da zero seguendo `sop.md`.
+Il codice Dart Flutter è stato scritto e si trova in `lib/`. Il codice Vue 3 è stato rimosso.
+
+**Passo successivo obbligatorio**: eseguire `flutter create .` nel container dev (noVNC) per generare lo scaffolding Android (`android/`, `ios/`, `test/`). Senza questo passo il progetto non è buildabile.
 
 ## Roadmap (da sop.md)
 
-1. Struttura progetto Flutter (`lib/`, `pubspec.yaml`, asset JSON)
-2. Container dev: Docker + Xvfb + noVNC su porta 6080 (`docker/dev/`)
-3. Container build headless APK (`docker/build/`)
-4. `StorageService` — persistenza con `shared_preferences`
-5. `ConversionService` — rawToCooked / cookedToRaw + asset `lib/data/conversions.json`
-6. Modelli dati: `MealPlan`, `DayPlan`, `ShoppingItem`
-7. Pagina Meal Planner (accordion per giorno, 3 pasti, add/remove voci)
-8. Pagina Converter (ricerca alimento → selezione metodo → calcolo bidirezionale)
-9. Pagina Shopping List (checklist, import da meal planner, svuota)
-10. `BottomNavigationBar` (Pasti | Converti | Spesa), portrait lock, Material 3
+1. ✅ Struttura progetto Flutter (`lib/`, `pubspec.yaml`, `assets/data/conversions.json`)
+2. ✅ `StorageService`, `ConversionService`, modelli dati
+3. ✅ Tutte e 3 le pagine + widget + provider
+4. ✅ `BottomNavigationBar`, portrait lock, Material 3
+5. ✅ Container dev: Docker + Xvfb + noVNC (`docker/dev/`)
+6. ✅ Container build headless APK (`docker/build/`)
+7. ⬜ Eseguire `flutter create .` nel container + `flutter pub get`
+8. ⬜ Configurare icona con `flutter pub run flutter_launcher_icons`
 
-## Comandi (quando il progetto Flutter esisterà)
+## Comandi
 
 ```bash
-# Sviluppo via container noVNC
+# Avvia container dev con GUI noVNC
 cd docker/dev && docker compose up
-# → http://localhost:6080  (desktop GUI nel browser)
-# Nel terminale noVNC: cd /workspace && flutter pub get && flutter run
+# → http://localhost:6080/vnc.html
 
-# Build APK
-bash docker/build/build.sh           # debug
-bash docker/build/build.sh --release # release firmato → dist/
+# Prima volta nel container (dal terminale noVNC):
+flutter create --project-name biteplan --org com.biteplan .
+flutter pub get && flutter pub run flutter_launcher_icons
+
+# Sviluppo nel container:
+flutter run -d linux      # app desktop nella GUI
+flutter run -d chrome     # app web
+
+# Test (nel container o con Flutter installato localmente):
+flutter test                       # unit + widget
+flutter test integration_test/    # e2e (richiede device/emulatore)
+
+# Build APK (headless, da host):
+bash docker/build/build.sh           # debug → dist/biteplan-debug.apk
+bash docker/build/build.sh --release # release firmato → dist/biteplan-release.apk
 ```
 
 ## Architettura target (Flutter)
@@ -64,13 +75,18 @@ lib/
 **Conversione**: `rawToCooked(raw, yield) = raw * yield` / `cookedToRaw(cooked, yield) = cooked / yield`.  
 **UI**: Material 3, seed color `Color(0xFF2d6a4f)`, touch target minimo 48×48 dp.
 
-## Riferimento funzionale (Vue → Flutter)
+## Testing
 
-| Vue (attuale) | Flutter (target) |
-|---|---|
-| `src/pages/MealPlanner.vue` | `lib/pages/meal_planner_page.dart` |
-| `src/pages/Converter.vue` | `lib/pages/converter_page.dart` |
-| `src/pages/ShoppingList.vue` | `lib/pages/shopping_list_page.dart` |
-| `src/utils/storage.js` | `lib/services/storage_service.dart` |
-| `src/utils/conversion.js` | `lib/services/conversion_service.dart` |
-| `src/data/conversions.json` | `lib/data/conversions.json` (asset) |
+```
+test/
+├── unit/
+│   ├── models/          # DayPlan, MealPlan, ConversionEntry, ShoppingItem
+│   └── providers/       # MealPlannerProvider, ShoppingListProvider
+└── widget/              # MealCard, ShoppingItemTile
+
+integration_test/
+└── app_test.dart        # navigazione, shopping list, converter, meal planner
+```
+
+- **Unit/widget**: `flutter test` — non richiedono dispositivo, usano `SharedPreferences.setMockInitialValues({})` per isolare lo storage
+- **Integration**: `flutter test integration_test/` — richiedono emulatore o device fisico
