@@ -1,109 +1,104 @@
-# Build APK — Docker
+# Docker — BitePlan
 
-Genera un APK Android senza installare nulla sull'host oltre a Docker.
-
-## Requisiti host
-
-| Requisito | Dettaglio |
-|-----------|-----------|
-| **Architettura** | x86_64 (amd64) — ARM/aarch64 non supportato |
-| **OS** | Linux x86_64 o macOS x86_64 |
-| **Docker** | Installato e avviato |
-| **Node.js** | v18+ (per il build Vite locale) |
-
-> Gli Android build-tools (`aapt2`, `zipalign`, `apksigner`) sono binari nativi x86_64 e non girano su host ARM senza emulazione QEMU.
+Due container distinti: uno per lo sviluppo, uno per la build APK.
 
 ---
 
-## Build debug (default)
+## Container dev (`docker/dev/`)
 
-APK firmato con il debug keystore di Android. Adatto per test su dispositivo.
+Avvia un web server Flutter con hot reload accessibile dal browser.
 
 ```bash
-bash docker/build.sh
+cd docker/dev
+docker compose up
 ```
+
+Apri **http://localhost:5173** nel browser.
+
+**Hot reload** — con il container attivo, in un altro terminale:
+
+```bash
+docker compose attach dev
+# premi 'r' → hot reload  |  'R' → hot restart  |  'q' → esci
+```
+
+Le modifiche ai file `.dart` sull'host sono visibili subito nel container
+grazie al volume montato — basta premere `r` per ricaricare.
+
+> Prima esecuzione: scarica Flutter SDK (~500 MB), richiede 5-10 minuti.
+> Le successive usano la cache Docker e sono molto più rapide.
 
 ---
 
-## Build release (distribuzione)
+## Container build (`docker/build/`)
 
-APK firmato con il tuo keystore personale. Necessario per distribuire l'app.
+Build headless riproducibile per generare l'APK Android.
 
-### 1. Genera il keystore (una volta sola)
+**Prerequisito**: la cartella `android/` deve esistere nel progetto.
+Se non esiste, generala con Flutter installato localmente o nel container dev:
+
+```bash
+flutter create --project-name biteplan --org com.biteplan .
+```
+
+### Build debug
+
+APK firmato con il debug keystore di Android — adatto per test su dispositivo.
+
+```bash
+bash docker/build/build.sh
+# → dist/biteplan-debug.apk
+```
+
+### Build release
+
+APK firmato con keystore personale — necessario per la distribuzione.
+
+**1. Genera il keystore (una sola volta)**
 
 ```bash
 keytool -genkey -v \
   -keystore docker/biteplan.jks \
   -alias biteplan \
-  -keyalg RSA \
-  -keysize 2048 \
-  -validity 10000
+  -keyalg RSA -keysize 2048 -validity 10000
 ```
 
-> Il file `docker/biteplan.jks` è già in `.gitignore` — non verrà mai committato.
-> Conservalo in un posto sicuro: senza di esso non puoi aggiornare l'app.
+> `docker/biteplan.jks` è in `.gitignore` — non verrà mai committato.
+> Conservalo in un posto sicuro: senza di esso non puoi pubblicare aggiornamenti.
 
-### 2. Esegui la build release
+**2. Esegui la build release**
 
 ```bash
-bash docker/build.sh --release
-# chiede interattivamente: Password keystore / Password chiave
+bash docker/build/build.sh --release
+# → dist/biteplan-release.apk
 ```
 
-Oppure passando le password come variabili d'ambiente (utile in CI):
+Il keystore viene montato nel container come volume read-only e non viene
+mai copiato nell'immagine Docker.
 
-```bash
-KEYSTORE_PASS=tuapassword KEY_PASS=tuapassword bash docker/build.sh --release
-```
-
-Per usare un keystore in un percorso diverso da `docker/biteplan.jks`:
-
-```bash
-KEYSTORE_PATH=/percorso/biteplan.jks bash docker/build.sh --release
-```
-
-### 3. Verifica la firma
-
-```bash
-$ANDROID_HOME/build-tools/34.0.0/apksigner verify --verbose dist/biteplan.apk
-```
+> Prima esecuzione: scarica Flutter SDK + Android SDK (~1-2 GB), richiede 10-15 minuti.
 
 ---
 
-## Flag combinabili
+## Flusso completo
 
-| Comando | Risultato |
-|---------|-----------|
-| `bash docker/build.sh` | APK debug dalla working directory |
-| `bash docker/build.sh --head` | APK debug dall'ultimo commit git |
-| `bash docker/build.sh --release` | APK release firmato dalla working directory |
-| `bash docker/build.sh --head --release` | APK release firmato dall'ultimo commit git |
+```
+cd docker/dev && docker compose up
+    → http://localhost:5173   (sviluppo con hot reload)
+    ↓
+flutter create --project-name biteplan --org com.biteplan .
+    (una volta sola, genera android/)
+    ↓
+bash docker/build/build.sh           # → dist/biteplan-debug.apk
+bash docker/build/build.sh --release # → dist/biteplan-release.apk
+    ↓
+adb install dist/biteplan-debug.apk
+```
 
 ---
-
-## Prima build
-
-La prima esecuzione scarica Android SDK (~1 GB) e può richiedere **10-15 minuti**.
-Le build successive usano la cache Docker e sono molto più rapide.
-
-## Installazione su dispositivo
-
-```bash
-adb install dist/biteplan.apk
-```
-
-## Pipeline
-
-```
-[host] npm run build          → dist/
-[docker] cap sync             → copia dist/ in android/assets/
-[docker] gradlew assembleDebug/Release
-[docker] zipalign + apksigner → solo in modalità release
-[host]   dist/biteplan.apk
-```
 
 ## Note
 
-- App ID: `com.davide.biteplan`
+- App ID: `com.biteplan.biteplan`
 - Android target: API 34
-- Il keystore non viene mai copiato nell'immagine Docker (montato come volume read-only)
+- Il keystore non viene mai copiato nell'immagine Docker (volume read-only)
