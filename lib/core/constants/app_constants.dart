@@ -1,3 +1,7 @@
+const String kAppVersion = '2.0.0';
+const String kAppAuthor = 'Davide Grilli';
+const String kAppLicense = 'EUPL v1.2';
+
 const List<String> kDayIds = [
   'lunedi',
   'martedi',

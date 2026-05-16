@@ -3,6 +3,7 @@ import 'core/theme/app_theme.dart';
 import 'features/meal_planner/presentation/pages/meal_planner_page.dart';
 import 'features/converter/presentation/pages/converter_page.dart';
 import 'features/shopping_list/presentation/pages/shopping_list_page.dart';
+import 'features/guide/presentation/widgets/info_bottom_sheet.dart';
 
 class BitePlanApp extends StatelessWidget {
   const BitePlanApp({super.key});
@@ -29,6 +30,8 @@ class _MainScaffoldState extends State<_MainScaffold> {
   int _currentIndex = 0;
   late final List<Widget> _pages;
 
+  static const _titles = ['Piano Pasti', 'Convertitore', 'Lista della spesa'];
+
   @override
   void initState() {
     super.initState();
@@ -44,6 +47,16 @@ class _MainScaffoldState extends State<_MainScaffold> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text(_titles[_currentIndex]),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.info_outline),
+            tooltip: 'Informazioni',
+            onPressed: () => showInfoBottomSheet(context),
+          ),
+        ],
+      ),
       body: IndexedStack(
         index: _currentIndex,
         children: _pages,

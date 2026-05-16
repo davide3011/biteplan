@@ -36,7 +36,7 @@ if [[ "$RELEASE" == "true" ]]; then
     -v "${PROJECT_ROOT}:/workspace" \
     -v "${HOME}/.gradle:/root/.gradle" \
     biteplan-build \
-    bash -c "cd /workspace && flutter pub get && flutter build apk --release"
+    bash -c "cd /workspace && flutter pub get && flutter pub run flutter_launcher_icons && flutter build apk --release"
 
   echo "→ Zipalign..."
   docker run --rm \
@@ -67,7 +67,7 @@ else
     -v "${PROJECT_ROOT}:/workspace" \
     -v "${HOME}/.gradle:/root/.gradle" \
     biteplan-build \
-    bash -c "cd /workspace && flutter pub get && flutter build apk --debug"
+    bash -c "cd /workspace && flutter pub get && flutter pub run flutter_launcher_icons && flutter build apk --debug"
 
   cp "${PROJECT_ROOT}/build/app/outputs/flutter-apk/app-debug.apk" \
      "${PROJECT_ROOT}/dist/biteplan-debug.apk"
