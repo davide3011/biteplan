@@ -32,14 +32,33 @@ class ShoppingItemTile extends StatelessWidget {
               ),
             ),
             Expanded(
-              child: Text(
-                item.name,
-                style: item.checked
-                    ? theme.textTheme.bodyMedium?.copyWith(
-                        decoration: TextDecoration.lineThrough,
-                        color: muted,
-                      )
-                    : theme.textTheme.bodyMedium,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      item.name,
+                      style: item.checked
+                          ? theme.textTheme.bodyMedium?.copyWith(
+                              decoration: TextDecoration.lineThrough,
+                              color: muted,
+                            )
+                          : theme.textTheme.bodyMedium,
+                    ),
+                  ),
+                  if (item.quantity > 1)
+                    Padding(
+                      padding: const EdgeInsets.only(left: 6),
+                      child: Text(
+                        '(x${item.quantity})',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: item.checked
+                              ? muted
+                              : theme.colorScheme.primary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                ],
               ),
             ),
             IconButton(

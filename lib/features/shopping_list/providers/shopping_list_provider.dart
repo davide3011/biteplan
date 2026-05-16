@@ -49,16 +49,26 @@ class ShoppingListProvider extends ChangeNotifier {
 
   void addAll(List<String> names) {
     final existing = _items.map((i) => i.name.toLowerCase()).toSet();
-    final seen = <String>{};
-    final toAdd = <ShoppingItem>[];
+
+    // Conta le occorrenze mantenendo il nome nella sua forma originale (prima occorrenza)
+    final counts = <String, int>{};
+    final canonical = <String, String>{};
     for (final name in names) {
       final key = name.toLowerCase().trim();
-      if (key.isNotEmpty && !existing.contains(key) && seen.add(key)) {
-        toAdd.add(ShoppingItem(
-          id: '${DateTime.now().millisecondsSinceEpoch}_${seen.length}',
-          name: name.trim(),
-        ));
-      }
+      if (key.isEmpty) continue;
+      counts[key] = (counts[key] ?? 0) + 1;
+      canonical.putIfAbsent(key, () => name.trim());
+    }
+
+    final toAdd = <ShoppingItem>[];
+    var i = 0;
+    for (final entry in counts.entries) {
+      if (existing.contains(entry.key)) continue;
+      toAdd.add(ShoppingItem(
+        id: '${DateTime.now().millisecondsSinceEpoch}_${i++}',
+        name: canonical[entry.key]!,
+        quantity: entry.value,
+      ));
     }
     if (toAdd.isEmpty) return;
     _items = [..._items, ...toAdd];
