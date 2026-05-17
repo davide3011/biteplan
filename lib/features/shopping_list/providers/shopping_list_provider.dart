@@ -6,6 +6,7 @@ import '../../../core/constants/app_constants.dart';
 
 class ShoppingListProvider extends ChangeNotifier {
   List<ShoppingItem> _items = [];
+  int _idSeq = 0;
 
   List<ShoppingItem> get items => _items;
   List<ShoppingItem> get pendingItems =>
@@ -39,7 +40,7 @@ class ShoppingListProvider extends ChangeNotifier {
     _items = [
       ..._items,
       ShoppingItem(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        id: '${DateTime.now().millisecondsSinceEpoch}_${_idSeq++}',
         name: t,
       ),
     ];
@@ -61,11 +62,10 @@ class ShoppingListProvider extends ChangeNotifier {
     }
 
     final toAdd = <ShoppingItem>[];
-    var i = 0;
     for (final entry in counts.entries) {
       if (existing.contains(entry.key)) continue;
       toAdd.add(ShoppingItem(
-        id: '${DateTime.now().millisecondsSinceEpoch}_${i++}',
+        id: '${DateTime.now().millisecondsSinceEpoch}_${_idSeq++}',
         name: canonical[entry.key]!,
         quantity: entry.value,
       ));
