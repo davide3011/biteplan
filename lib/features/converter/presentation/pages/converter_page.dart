@@ -89,7 +89,6 @@ class _ConverterPageState extends State<ConverterPage> {
                         : null,
                   ),
                   onChanged: (v) {
-                    setState(() {});
                     context.read<ConverterProvider>().search(v);
                   },
                 ),

@@ -57,6 +57,8 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final provider = context.watch<ShoppingListProvider>();
+    final pending = provider.pendingItems;
+    final checked = provider.checkedItems;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -73,8 +75,8 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
               ),
               if (provider.items.isNotEmpty)
                 Text(
-                  '${provider.checkedItems.length} / ${provider.items.length} '
-                  'completat${provider.checkedItems.length == 1 ? 'o' : 'i'}',
+                  '${checked.length} / ${provider.items.length} '
+                  'completat${checked.length == 1 ? 'o' : 'i'}',
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                   ),
@@ -124,25 +126,23 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
                   children: [
                     // Pending items
-                    if (provider.pendingItems.isNotEmpty)
+                    if (pending.isNotEmpty)
                       Card(
                         margin: EdgeInsets.zero,
                         child: Column(
                           children: [
-                            for (int i = 0;
-                                i < provider.pendingItems.length;
-                                i++) ...[
+                            for (int i = 0; i < pending.length; i++) ...[
                               if (i > 0)
                                 const Divider(
                                     height: 1, indent: 16, endIndent: 16),
                               ShoppingItemTile(
-                                item: provider.pendingItems[i],
+                                item: pending[i],
                                 onToggle: () => context
                                     .read<ShoppingListProvider>()
-                                    .toggle(provider.pendingItems[i].id),
+                                    .toggle(pending[i].id),
                                 onRemove: () => context
                                     .read<ShoppingListProvider>()
-                                    .remove(provider.pendingItems[i].id),
+                                    .remove(pending[i].id),
                               ),
                             ],
                           ],
@@ -150,13 +150,13 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
                       ),
 
                     // Checked section
-                    if (provider.checkedItems.isNotEmpty) ...[
+                    if (checked.isNotEmpty) ...[
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         child: Row(
                           children: [
                             Text(
-                              'COMPLETATI (${provider.checkedItems.length})',
+                              'COMPLETATI (${checked.length})',
                               style: theme.textTheme.labelSmall?.copyWith(
                                 fontWeight: FontWeight.w700,
                                 letterSpacing: 0.8,
@@ -178,20 +178,18 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
                         margin: EdgeInsets.zero,
                         child: Column(
                           children: [
-                            for (int i = 0;
-                                i < provider.checkedItems.length;
-                                i++) ...[
+                            for (int i = 0; i < checked.length; i++) ...[
                               if (i > 0)
                                 const Divider(
                                     height: 1, indent: 16, endIndent: 16),
                               ShoppingItemTile(
-                                item: provider.checkedItems[i],
+                                item: checked[i],
                                 onToggle: () => context
                                     .read<ShoppingListProvider>()
-                                    .toggle(provider.checkedItems[i].id),
+                                    .toggle(checked[i].id),
                                 onRemove: () => context
                                     .read<ShoppingListProvider>()
-                                    .remove(provider.checkedItems[i].id),
+                                    .remove(checked[i].id),
                               ),
                             ],
                           ],
