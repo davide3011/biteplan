@@ -1,10 +1,8 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:provider/provider.dart';
-import '../../models/meal_plan.dart';
 import '../../providers/meal_planner_provider.dart';
-import '../../../../core/constants/app_constants.dart';
+import '../../qr_codec.dart';
 
 class QrScanPage extends StatefulWidget {
   const QrScanPage({super.key});
@@ -23,51 +21,19 @@ class _QrScanPageState extends State<QrScanPage> {
 
     setState(() => _handled = true);
 
-    try {
-      final parsed = jsonDecode(raw) as Map<String, dynamic>;
-      if (parsed['v'] != 1 || parsed['meals'] is! Map) {
-        _showError(context, 'QR non valido: dati non riconosciuti.');
-        return;
-      }
-      final mealsMap = parsed['meals'] as Map<String, dynamic>;
-      for (final day in kDayIds) {
-        final dayData = mealsMap[day];
-        if (dayData is! Map) {
-          _showError(context, 'QR non valido: struttura dati errata.');
-          return;
-        }
-        for (final slot in kMealSlots) {
-          if (dayData[slot] is! List) {
-            _showError(context, 'QR non valido: struttura dati errata.');
-            return;
-          }
-        }
-      }
+    final (plan, error) = parseMealPlanFromQr(raw);
+    if (error != null) {
+      _showError(context, error);
+      return;
+    }
 
-      final plan = MealPlan(Map.fromEntries(
-        kDayIds.map((day) {
-          final d = mealsMap[day] as Map<String, dynamic>;
-          return MapEntry(
-            day,
-            DayPlan(
-              colazione: List<String>.from(d['colazione'] as List),
-              pranzo: List<String>.from(d['pranzo'] as List),
-              cena: List<String>.from(d['cena'] as List),
-            ),
-          );
-        }),
-      ));
+    context.read<MealPlannerProvider>().importPlan(plan!);
 
-      context.read<MealPlannerProvider>().importPlan(plan);
-
-      if (context.mounted) {
-        Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Piano ricevuto!')),
-        );
-      }
-    } catch (_) {
-      _showError(context, 'QR non riconosciuto.');
+    if (context.mounted) {
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Piano ricevuto!')),
+      );
     }
   }
 

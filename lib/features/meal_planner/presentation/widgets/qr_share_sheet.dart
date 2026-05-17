@@ -1,9 +1,7 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import '../../models/meal_plan.dart';
-
-const int _kQrMaxBytes = 2953;
+import '../../qr_codec.dart';
 
 void showQrShareSheet(BuildContext context, MealPlan plan) {
   showModalBottomSheet(
@@ -20,17 +18,7 @@ class _QrShareSheet extends StatelessWidget {
   final MealPlan plan;
   const _QrShareSheet({required this.plan});
 
-  String? _buildPayload() {
-    final payload = jsonEncode({'v': 1, 'meals': plan.days.map(
-      (k, v) => MapEntry(k, {
-        'colazione': v.colazione,
-        'pranzo': v.pranzo,
-        'cena': v.cena,
-      }),
-    )});
-    if (payload.length > _kQrMaxBytes) return null;
-    return payload;
-  }
+  String? _buildPayload() => buildQrPayload(plan);
 
   @override
   Widget build(BuildContext context) {
