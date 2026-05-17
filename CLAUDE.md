@@ -4,89 +4,93 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-BitePlan è un'app Android per meal planning, conversione crudo/cotto e lista della spesa. Il progetto è in **riscrittura completa da Vue 3 + Capacitor a Flutter**. Segui `sop.md` come piano di lavoro: ogni sezione del SOP corrisponde a una fase da completare in ordine. L'obiettivo finale è un APK Android buildabile via Docker. Tutta la UI e la UX sono in **italiano**.
-
-## Stato attuale
-
-Il codice Dart Flutter è stato scritto e si trova in `lib/`. Il codice Vue 3 è stato rimosso.
-
-**Passo successivo obbligatorio**: eseguire `flutter create .` nel container dev (noVNC) per generare lo scaffolding Android (`android/`, `ios/`, `test/`). Senza questo passo il progetto non è buildabile.
-
-## Roadmap (da sop.md)
-
-1. ✅ Struttura progetto Flutter (`lib/`, `pubspec.yaml`, `assets/data/conversions.json`)
-2. ✅ `StorageService`, `ConversionService`, modelli dati
-3. ✅ Tutte e 3 le pagine + widget + provider
-4. ✅ `BottomNavigationBar`, portrait lock, Material 3
-5. ✅ Container dev: Docker + Xvfb + noVNC (`docker/dev/`)
-6. ✅ Container build headless APK (`docker/build/`)
-7. ⬜ Eseguire `flutter create .` nel container + `flutter pub get`
-8. ⬜ Configurare icona con `flutter pub run flutter_launcher_icons`
+BitePlan è un'app Android per meal planning, conversione crudo/cotto e lista della spesa, scritta in Flutter. Tutta la UI e la UX sono in **italiano**. L'obiettivo finale è un APK Android buildabile via Docker.
 
 ## Comandi
 
 ```bash
-# Avvia container dev con GUI noVNC
+# Sviluppo (web server con hot reload)
 cd docker/dev && docker compose up
-# → http://localhost:6080/vnc.html
+# → http://localhost:5173
+# Con il container attivo: docker compose attach dev  →  r = hot reload
 
-# Prima volta nel container (dal terminale noVNC):
-flutter create --project-name biteplan --org com.biteplan .
-flutter pub get && flutter pub run flutter_launcher_icons
+# Test (dalla root del progetto — richiede immagine biteplan-build)
+docker run --rm -v "$(pwd):/workspace" -w /workspace biteplan-build \
+  bash -c "flutter pub get && flutter test"
 
-# Sviluppo nel container:
-flutter run -d linux      # app desktop nella GUI
-flutter run -d chrome     # app web
+# Test singolo file
+docker run --rm -v "$(pwd):/workspace" -w /workspace biteplan-build \
+  bash -c "flutter test test/features/meal_planner/qr_test.dart"
 
-# Test (nel container o con Flutter installato localmente):
-flutter test                       # unit + widget
-flutter test integration_test/    # e2e (richiede device/emulatore)
-
-# Build APK (headless, da host):
-bash docker/build/build.sh           # debug → dist/biteplan-debug.apk
-bash docker/build/build.sh --release # release firmato → dist/biteplan-release.apk
+# Build APK (headless, da host)
+bash docker/build/build.sh           # debug  → dist/biteplan-debug.apk
+bash docker/build/build.sh --release # release → dist/biteplan-release.apk
 ```
 
-## Architettura target (Flutter)
+## Architettura
 
 ```
 lib/
 ├── main.dart
-├── app.dart                    # MaterialApp, routing, BottomNavigationBar
-├── pages/
-│   ├── meal_planner_page.dart
-│   ├── converter_page.dart
-│   └── shopping_list_page.dart
-├── widgets/
-│   ├── meal_card.dart
-│   └── checkbox_item.dart
-├── models/
-│   ├── meal_plan.dart
-│   └── shopping_item.dart
-├── services/
-│   ├── storage_service.dart
-│   └── conversion_service.dart
-└── data/
-    └── conversions.json        # 50+ alimenti × metodi cottura, yield = cotto/crudo
+├── app.dart                          # MaterialApp, NavigationBar, AppBar con bottone info
+├── core/
+│   ├── constants/app_constants.dart  # kDayIds, kMealSlots, kStorageKey*, kAppVersion
+│   └── theme/app_theme.dart
+├── shared/
+│   ├── services/storage_service.dart # wrapper SharedPreferences (load/save)
+│   └── widgets/
+├── features/
+│   ├── meal_planner/
+│   │   ├── models/meal_plan.dart         # MealPlan, DayPlan
+│   │   ├── providers/meal_planner_provider.dart
+│   │   ├── qr_codec.dart                 # buildQrPayload, parseMealPlanFromQr
+│   │   └── presentation/
+│   │       ├── pages/meal_planner_page.dart
+│   │       ├── pages/qr_scan_page.dart
+│   │       └── widgets/meal_card.dart, qr_share_sheet.dart
+│   ├── converter/
+│   │   ├── models/conversion_entry.dart  # rawToCooked, cookedToRaw (metodi sul model)
+│   │   ├── providers/converter_provider.dart
+│   │   └── presentation/pages/converter_page.dart
+│   ├── shopping_list/
+│   │   ├── models/shopping_item.dart     # quantity per aggregazione duplicati
+│   │   ├── providers/shopping_list_provider.dart
+│   │   └── presentation/
+│   │       ├── pages/shopping_list_page.dart
+│   │       └── widgets/shopping_item_tile.dart
+│   └── guide/
+│       └── presentation/
+│           ├── pages/guide_page.dart          # 3 tab: Pasti, Converti, Spesa
+│           └── widgets/info_bottom_sheet.dart # aperto dal bottone info in AppBar
+└── assets/data/conversions.json       # 50+ alimenti × metodi cottura
 ```
 
-**Stato**: Provider o Riverpod (nessuno store esterno pesante).  
+**State management**: Provider (`ChangeNotifier`).  
 **Persistenza**: `shared_preferences`, chiavi `meals` e `shopping_list` (JSON serializzato).  
-**Conversione**: `rawToCooked(raw, yield) = raw * yield` / `cookedToRaw(cooked, yield) = cooked / yield`.  
-**UI**: Material 3, seed color `Color(0xFF2d6a4f)`, touch target minimo 48×48 dp.
+**Conversione**: logica in `ConversionEntry` — `rawToCooked = raw * yieldFactor`, `cookedToRaw = cooked / yieldFactor`.  
+**UI**: Material 3, seed color `Color(0xFF2d6a4f)`, tutto in italiano.  
+**QR**: payload JSON `{ "v": 1, "meals": { ... } }`, limite 2953 byte (capacità QR con error correction L).
 
 ## Testing
 
+110 test (unit + widget). Non richiedono device fisico.
+
 ```
 test/
-├── unit/
-│   ├── models/          # DayPlan, MealPlan, ConversionEntry, ShoppingItem
-│   └── providers/       # MealPlannerProvider, ShoppingListProvider
-└── widget/              # MealCard, ShoppingItemTile
-
-integration_test/
-└── app_test.dart        # navigazione, shopping list, converter, meal planner
+├── helpers/pump_app.dart              # estensione pumpApp per widget test
+└── features/
+    ├── converter/
+    │   ├── models/conversion_entry_test.dart
+    │   └── providers/converter_provider_test.dart
+    ├── meal_planner/
+    │   ├── models/meal_plan_test.dart
+    │   ├── providers/meal_planner_provider_test.dart
+    │   ├── widgets/meal_card_test.dart
+    │   └── qr_test.dart
+    └── shopping_list/
+        ├── models/shopping_item_test.dart
+        ├── providers/shopping_list_provider_test.dart
+        └── widgets/shopping_item_tile_test.dart
 ```
 
-- **Unit/widget**: `flutter test` — non richiedono dispositivo, usano `SharedPreferences.setMockInitialValues({})` per isolare lo storage
-- **Integration**: `flutter test integration_test/` — richiedono emulatore o device fisico
+I test usano `SharedPreferences.setMockInitialValues({})` per isolare lo storage.
