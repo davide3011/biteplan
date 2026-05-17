@@ -59,4 +59,10 @@ class MealPlannerProvider extends ChangeNotifier {
     notifyListeners();
     _save();
   }
+
+  void importPlan(MealPlan plan) {
+    _plan = plan;
+    notifyListeners();
+    _save();
+  }
 }

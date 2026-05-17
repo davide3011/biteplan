@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/meal_planner_provider.dart';
 import '../widgets/meal_card.dart';
+import '../widgets/qr_share_sheet.dart';
+import '../pages/qr_scan_page.dart';
 import '../../../shopping_list/providers/shopping_list_provider.dart';
 import '../../../../core/constants/app_constants.dart';
 
@@ -136,6 +138,32 @@ class MealPlannerPage extends StatelessWidget {
                   child: const Text('Svuota piano'),
                 ),
               ],
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: provider.plan.hasAnyMeal
+                          ? () => showQrShareSheet(context, provider.plan)
+                          : null,
+                      icon: const Icon(Icons.qr_code, size: 18),
+                      label: const Text('Condividi'),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => const QrScanPage()),
+                      ),
+                      icon: const Icon(Icons.qr_code_scanner, size: 18),
+                      label: const Text('Ricevi'),
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
         ),
