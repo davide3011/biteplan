@@ -24,79 +24,81 @@ Widget _card({
     );
 
 void main() {
-  testWidgets('mostra il nome del giorno', (tester) async {
-    await tester.pumpApp(_card());
-    expect(find.text('Lunedì'), findsOneWidget);
-  });
+  group('MealCard', () {
+    testWidgets('mostra il nome del giorno', (tester) async {
+      await tester.pumpApp(_card());
+      expect(find.text('Lunedì'), findsOneWidget);
+    });
 
-  testWidgets('mostra il conteggio voci nel sottotitolo', (tester) async {
-    await tester.pumpApp(_card(
-      dayPlan: DayPlan(colazione: ['latte', 'caffè'], pranzo: ['pasta']),
-    ));
-    expect(find.text('3 voci'), findsOneWidget);
-  });
+    testWidgets('mostra il conteggio voci nel sottotitolo', (tester) async {
+      await tester.pumpApp(_card(
+        dayPlan: DayPlan(colazione: ['latte', 'caffè'], pranzo: ['pasta']),
+      ));
+      expect(find.text('3 voci'), findsOneWidget);
+    });
 
-  testWidgets('usa forma singolare per 1 voce', (tester) async {
-    await tester.pumpApp(_card(dayPlan: DayPlan(colazione: ['latte'])));
-    expect(find.text('1 voce'), findsOneWidget);
-  });
+    testWidgets('usa forma singolare per 1 voce', (tester) async {
+      await tester.pumpApp(_card(dayPlan: DayPlan(colazione: ['latte'])));
+      expect(find.text('1 voce'), findsOneWidget);
+    });
 
-  testWidgets('nessun sottotitolo quando il giorno è vuoto', (tester) async {
-    await tester.pumpApp(_card());
-    expect(find.text('0 voci'), findsNothing);
-    expect(find.text('voce'), findsNothing);
-  });
+    testWidgets('nessun sottotitolo quando il giorno è vuoto', (tester) async {
+      await tester.pumpApp(_card());
+      expect(find.text('0 voci'), findsNothing);
+      expect(find.text('voce'), findsNothing);
+    });
 
-  testWidgets('mostra gli elementi quando espanso', (tester) async {
-    await tester.pumpApp(_card(
-      dayPlan: DayPlan(colazione: ['latte'], cena: ['pollo al forno']),
-      initiallyExpanded: true,
-    ));
-    await tester.pumpAndSettle();
-    expect(find.text('latte'), findsOneWidget);
-    expect(find.text('pollo al forno'), findsOneWidget);
-  });
+    testWidgets('mostra gli elementi quando espanso', (tester) async {
+      await tester.pumpApp(_card(
+        dayPlan: DayPlan(colazione: ['latte'], cena: ['pollo al forno']),
+        initiallyExpanded: true,
+      ));
+      await tester.pumpAndSettle();
+      expect(find.text('latte'), findsOneWidget);
+      expect(find.text('pollo al forno'), findsOneWidget);
+    });
 
-  testWidgets('chiama onAdd con slot e testo corretti', (tester) async {
-    String? capturedSlot;
-    String? capturedText;
+    testWidgets('chiama onAdd con slot e testo corretti', (tester) async {
+      String? capturedSlot;
+      String? capturedText;
 
-    await tester.pumpApp(_card(
-      initiallyExpanded: true,
-      onAdd: (slot, text) {
-        capturedSlot = slot;
-        capturedText = text;
-      },
-    ));
-    await tester.pumpAndSettle();
+      await tester.pumpApp(_card(
+        initiallyExpanded: true,
+        onAdd: (slot, text) {
+          capturedSlot = slot;
+          capturedText = text;
+        },
+      ));
+      await tester.pumpAndSettle();
 
-    await tester.enterText(find.byType(TextField).first, 'yogurt');
-    await tester.testTextInput.receiveAction(TextInputAction.done);
-    await tester.pump();
+      await tester.enterText(find.byType(TextField).first, 'yogurt');
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      await tester.pump();
 
-    expect(capturedSlot, 'colazione');
-    expect(capturedText, 'yogurt');
-  });
+      expect(capturedSlot, 'colazione');
+      expect(capturedText, 'yogurt');
+    });
 
-  testWidgets('chiama onRemove quando si preme il pulsante elimina',
-      (tester) async {
-    String? removedSlot;
-    int? removedIndex;
+    testWidgets('chiama onRemove quando si preme il pulsante elimina',
+        (tester) async {
+      String? removedSlot;
+      int? removedIndex;
 
-    await tester.pumpApp(_card(
-      dayPlan: DayPlan(colazione: ['latte']),
-      initiallyExpanded: true,
-      onRemove: (slot, index) {
-        removedSlot = slot;
-        removedIndex = index;
-      },
-    ));
-    await tester.pumpAndSettle();
+      await tester.pumpApp(_card(
+        dayPlan: DayPlan(colazione: ['latte']),
+        initiallyExpanded: true,
+        onRemove: (slot, index) {
+          removedSlot = slot;
+          removedIndex = index;
+        },
+      ));
+      await tester.pumpAndSettle();
 
-    await tester.tap(find.byIcon(Icons.close).first);
-    await tester.pump();
+      await tester.tap(find.byIcon(Icons.close).first);
+      await tester.pump();
 
-    expect(removedSlot, 'colazione');
-    expect(removedIndex, 0);
+      expect(removedSlot, 'colazione');
+      expect(removedIndex, 0);
+    });
   });
 }

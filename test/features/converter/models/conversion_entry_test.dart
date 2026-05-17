@@ -61,5 +61,14 @@ void main() {
       expect(entry.rawToCooked(0), 0.0);
       expect(entry.cookedToRaw(0), 0.0);
     });
+
+    test('yield = 0: rawToCooked restituisce 0', () {
+      const entry = ConversionEntry(
+        food: 'test',
+        method: 'test',
+        yieldFactor: 0.0,
+      );
+      expect(entry.rawToCooked(100), 0.0);
+    });
   });
 }
