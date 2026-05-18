@@ -12,20 +12,6 @@ done
 echo "→ Build immagine biteplan-build..."
 docker build -t biteplan-build "${SCRIPT_DIR}"
 
-if [[ ! -d "${PROJECT_ROOT}/android" ]]; then
-  echo "→ Cartella android/ non trovata, eseguo flutter create..."
-  docker run --rm \
-    -v "${PROJECT_ROOT}:/workspace" \
-    biteplan-build \
-    bash -c "
-      cd /workspace &&
-      flutter create --project-name biteplan --org com.biteplan --platforms=android . &&
-      MANIFEST=android/app/src/main/AndroidManifest.xml &&
-      grep -q 'CAMERA' \"\$MANIFEST\" ||
-        sed -i 's|<application|<uses-permission android:name=\"android.permission.CAMERA\" />\n    <application|' \"\$MANIFEST\"
-    "
-fi
-
 mkdir -p "${PROJECT_ROOT}/dist"
 
 if [[ "$RELEASE" == "true" ]]; then

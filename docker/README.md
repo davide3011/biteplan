@@ -48,19 +48,28 @@ bash docker/build/build.sh
 
 ### Build release
 
-APK firmato con keystore personale — necessario per la distribuzione.
+APK firmato con keystore — necessario per la distribuzione.
 
-**1. Genera il keystore (una sola volta)**
+**1. Ottieni il keystore**
 
-```bash
-keytool -genkey -v \
-  -keystore docker/biteplan.jks \
-  -alias biteplan \
-  -keyalg RSA -keysize 2048 -validity 10000
-```
+Il file `docker/biteplan.jks` non è nel repo (è in `.gitignore`).
+Hai due opzioni:
 
-> `docker/biteplan.jks` è in `.gitignore` e non verrà mai committato.
-> Conservalo in un posto sicuro: senza di esso non puoi pubblicare aggiornamenti.
+- **Collaboratore**: ricevi `docker/biteplan.jks` dall'autore del progetto via canale sicuro
+  (es. password manager condiviso). Usare lo stesso keystore garantisce APK aggiornabili
+  sui dispositivi che hanno già l'app installata.
+
+- **Fork/uso personale**: genera il tuo keystore (produce APK non compatibili con quelli
+  firmati dall'autore):
+  ```bash
+  keytool -genkey -v \
+    -keystore docker/biteplan.jks \
+    -alias biteplan \
+    -keyalg RSA -keysize 2048 -validity 10000
+  ```
+
+> Conserva `docker/biteplan.jks` in un posto sicuro: perderlo significa non poter più
+> pubblicare aggiornamenti firmati con la stessa identità.
 
 **2. Esporta la password del keystore**
 
