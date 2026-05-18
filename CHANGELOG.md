@@ -7,6 +7,40 @@ il progetto aderisce al [Semantic Versioning](https://semver.org/lang/it/).
 
 ---
 
+## [2.0.0] — 2026-05-18
+
+### Aggiunto
+
+- **Condivisione piano pasti via QR code** — pulsante "Condividi" genera un QR code che codifica l'intero piano settimanale; un secondo dispositivo può scansionarlo per importare il piano (`qr_flutter` + `mobile_scanner`)
+- **Aggregazione duplicati nella lista della spesa** — voci identiche vengono raggruppate con contatore quantità (es. "zucchine (x2)")
+- **Guida utente in-app** — tre tab (Pasti, Converti, Spesa) accessibili dal pulsante info nell'AppBar
+- **Icona launcher adattiva** — icona Android generata automaticamente da `assets/icon-only.png` con sfondo `#2d6a4f` (`flutter_launcher_icons`)
+- **Build APK debug e release via Docker** — `bash docker/build/build.sh` per debug, `--release` per release firmato; keystore mai incluso nell'immagine
+- **Container dev con hot reload** — `docker compose up` in `docker/dev/` avvia un web server Flutter su `http://localhost:5173`; `r` per hot reload
+- **Suite di test** — 110 test unit e widget, eseguibili senza device fisico
+
+### Modificato
+
+- **Framework** — riscritta da zero in Flutter/Dart (da Vue 3 + Capacitor); UI Material 3, seed color `#2d6a4f`
+- **State management** — Provider + ChangeNotifier (da Vuex/reactive Vue)
+- **Persistenza** — `shared_preferences` con chiavi `meals` e `shopping_list` in JSON (da `localStorage`)
+- **Build pipeline** — Docker headless con Flutter SDK pinnato a `3.41.9`, Gradle cache isolata in named volume, `--enforce-lockfile` per dipendenze riproducibili
+- **applicationId** — `com.davide.biteplan` (compatibile con v1.2.1 per aggiornamento diretto)
+- **versionCode** — `10300` (superiore al `10201` della v1.2.1 Capacitor)
+
+### Fix
+
+- **Firma APK release** — password keystore passata via `BITEPLAN_KEYSTORE_PASS` invece di stdin interattivo (che si bloccava nel container Docker senza TTY)
+- **ID univoci nella lista della spesa** — rimosso utilizzo di `DateTime.now()` come ID, sostituito con UUID per evitare collisioni su inserimenti rapidi
+
+### Tecnico
+
+- Flutter 3.41.9 / Dart 3.11.5
+- Android targetSdk 34, minSdk 21
+- `android/` versionata nel repo con configurazione completa; `pubspec.lock` committato per build riproducibili
+
+---
+
 ## [1.2.1] — 2026-04-12
 
 ### Fix

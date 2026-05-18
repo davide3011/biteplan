@@ -194,7 +194,7 @@ Motivazione: la friggitrice ad aria usa aria calda ad alta velocità → maggior
 
 ## Aggiungere o modificare alimenti
 
-I dati sono definiti in `src/data/conversions.json`. Per aggiungere un nuovo alimento:
+I dati sono definiti in `asset/data/conversions.json`. Per aggiungere un nuovo alimento:
 
 ```json
 "nome-alimento": {
