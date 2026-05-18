@@ -16,16 +16,27 @@ cd docker/dev && docker compose up
 
 # Test (dalla root del progetto — richiede immagine biteplan-build)
 docker run --rm -v "$(pwd):/workspace" -w /workspace biteplan-build \
-  bash -c "flutter pub get && flutter test"
+  bash -c "flutter pub get --enforce-lockfile && flutter test"
 
 # Test singolo file
 docker run --rm -v "$(pwd):/workspace" -w /workspace biteplan-build \
   bash -c "flutter test test/features/meal_planner/qr_test.dart"
 
 # Build APK (headless, da host)
-bash docker/build/build.sh           # debug  → dist/biteplan-debug.apk
-bash docker/build/build.sh --release # release → dist/biteplan-release.apk
+bash docker/build/build.sh                        # debug  → dist/biteplan-debug.apk
+export BITEPLAN_KEYSTORE_PASS=password            # richiesto solo per --release
+bash docker/build/build.sh --release              # release → dist/biteplan-release.apk
 ```
+
+## Build e firma
+
+- **Flutter pinnato**: versione `3.41.9` nei Dockerfile (`ARG FLUTTER_VERSION`); aggiornare anche `.flutter-version`
+- **Gradle cache**: named volume Docker `gradle-cache`, isolata dall'host
+- **Dipendenze**: `pubspec.lock` committato; la build usa `--enforce-lockfile` e fallisce se il lock non è allineato
+- **Keystore**: `docker/biteplan.jks` è in `.gitignore`; da ottenere dall'autore o generare con `keytool`
+- **Firma release**: password passata via `BITEPLAN_KEYSTORE_PASS` (mai hardcoded); alias keystore: `biteplan`
+- **applicationId**: `com.davide.biteplan` — non cambiare, garantisce aggiornamento diretto dalla v1.2.1
+- **versionCode**: letto da `pubspec.yaml` (`version: X.Y.Z+BUILD`); BUILD deve essere sempre crescente
 
 ## Architettura
 
