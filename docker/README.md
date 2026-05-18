@@ -62,7 +62,16 @@ keytool -genkey -v \
 > `docker/biteplan.jks` è in `.gitignore` e non verrà mai committato.
 > Conservalo in un posto sicuro: senza di esso non puoi pubblicare aggiornamenti.
 
-**2. Esegui la build release**
+**2. Esporta la password del keystore**
+
+```bash
+export BITEPLAN_KEYSTORE_PASS=tuapassword
+```
+
+La variabile è richiesta ad ogni sessione di terminale. Per non doverla riscrivere ogni volta,
+aggiungila a `~/.bashrc` o `~/.zshrc`.
+
+**3. Esegui la build release**
 
 ```bash
 bash docker/build/build.sh --release
@@ -71,6 +80,10 @@ bash docker/build/build.sh --release
 
 Il keystore viene montato nel container come volume read-only e non viene mai copiato
 nell'immagine Docker.
+
+> Se la build fallisce con `Output file '…/biteplan-aligned.apk' exists`, esegui
+> `rm dist/biteplan-aligned.apk` e rilancia. Lo script rimuove il file automaticamente
+> nelle versioni aggiornate, ma eventuali run interrotte possono lasciarlo indietro.
 
 > Prima esecuzione: scarica Flutter SDK + Android SDK (~1-2 GB), richiede 10-15 minuti.
 

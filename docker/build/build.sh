@@ -29,6 +29,12 @@ fi
 mkdir -p "${PROJECT_ROOT}/dist"
 
 if [[ "$RELEASE" == "true" ]]; then
+  if [[ -z "${BITEPLAN_KEYSTORE_PASS}" ]]; then
+    echo "ERRORE: variabile BITEPLAN_KEYSTORE_PASS non impostata"
+    echo "Usa: export BITEPLAN_KEYSTORE_PASS=tuapassword"
+    exit 1
+  fi
+
   KEYSTORE="${SCRIPT_DIR}/../biteplan.jks"
   if [[ ! -f "$KEYSTORE" ]]; then
     echo "ERRORE: keystore non trovato in docker/biteplan.jks"
@@ -40,11 +46,12 @@ if [[ "$RELEASE" == "true" ]]; then
   echo "→ Building release APK..."
   docker run --rm \
     -v "${PROJECT_ROOT}:/workspace" \
-    -v "${HOME}/.gradle:/root/.gradle" \
+    -v "gradle-cache:/root/.gradle" \
     biteplan-build \
-    bash -c "cd /workspace && flutter pub get && flutter pub run flutter_launcher_icons && flutter build apk --release"
+    bash -c "cd /workspace && flutter pub get --enforce-lockfile && flutter pub run flutter_launcher_icons && flutter build apk --release"
 
   echo "→ Zipalign..."
+  rm -f "${PROJECT_ROOT}/dist/biteplan-aligned.apk"
   docker run --rm \
     -v "${PROJECT_ROOT}:/workspace" \
     biteplan-build \
@@ -56,9 +63,11 @@ if [[ "$RELEASE" == "true" ]]; then
   docker run --rm \
     -v "${PROJECT_ROOT}:/workspace" \
     -v "$(realpath "${KEYSTORE%/*}"):/keystore:ro" \
+    -e BITEPLAN_KEYSTORE_PASS \
     biteplan-build \
     bash -c "apksigner sign \
       --ks /keystore/biteplan.jks \
+      --ks-pass \"pass:\${BITEPLAN_KEYSTORE_PASS}\" \
       --out /workspace/dist/biteplan-release.apk \
       /workspace/dist/biteplan-aligned.apk && \
       rm -f /workspace/dist/biteplan-aligned.apk && \
@@ -71,9 +80,9 @@ else
   echo "→ Building debug APK..."
   docker run --rm \
     -v "${PROJECT_ROOT}:/workspace" \
-    -v "${HOME}/.gradle:/root/.gradle" \
+    -v "gradle-cache:/root/.gradle" \
     biteplan-build \
-    bash -c "cd /workspace && flutter pub get && flutter pub run flutter_launcher_icons && flutter build apk --debug"
+    bash -c "cd /workspace && flutter pub get --enforce-lockfile && flutter pub run flutter_launcher_icons && flutter build apk --debug"
 
   cp "${PROJECT_ROOT}/build/app/outputs/flutter-apk/app-debug.apk" \
      "${PROJECT_ROOT}/dist/biteplan-debug.apk"
