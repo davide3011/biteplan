@@ -4,63 +4,93 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-BitePlan is a mobile-first Vue 3 PWA for meal planning, raw↔cooked weight conversion, and shopping list management. It targets Android via Capacitor and is designed for a 480px-max viewport. All UI strings and documentation are in **Italian**.
+BitePlan è un'app Android per meal planning, conversione crudo/cotto e lista della spesa, scritta in Flutter. Tutta la UI e la UX sono in **italiano**. L'obiettivo finale è un APK Android buildabile via Docker.
 
-## Commands
+## Comandi
 
 ```bash
-npm run dev          # Dev server at http://localhost:5173
-npm run build        # Production build → dist/
-npm run preview      # Preview built app
+# Sviluppo (web server con hot reload)
+cd docker/dev && docker compose up
+# → http://localhost:5173
+# Con il container attivo: docker compose attach dev  →  r = hot reload
 
-npm test             # Vitest unit + integration tests (watch mode)
-npm run test:coverage  # Coverage report (v8 provider)
-npm run test:e2e     # Playwright e2e (requires dev server running)
-npm run test:e2e:ui  # Playwright interactive UI mode
+# Test (dalla root del progetto — richiede immagine biteplan-build)
+docker run --rm -v "$(pwd):/workspace" -w /workspace biteplan-build \
+  bash -c "flutter pub get && flutter test"
 
-# Single test file
-npx vitest run tests/unit/conversion.test.js
+# Test singolo file
+docker run --rm -v "$(pwd):/workspace" -w /workspace biteplan-build \
+  bash -c "flutter test test/features/meal_planner/qr_test.dart"
 
-# Android APK
-bash docker/build.sh           # Debug APK
-bash docker/build.sh --release # Signed release APK
+# Build APK (headless, da host)
+bash docker/build/build.sh           # debug  → dist/biteplan-debug.apk
+bash docker/build/build.sh --release # release → dist/biteplan-release.apk
 ```
 
-E2E tests simulate iPhone 14 Pro viewport (393×852) with Italian locale.
+## Architettura
 
-## Architecture
-
-**App.vue** is the root router — it conditionally renders three pages based on a `currentPage` ref (`meal`, `convert`, `shop`) and hosts the portrait-lock transform, `InfoPanel`, and `DocsPanel`.
-
-**Three pages** in `src/pages/`:
-- `MealPlanner.vue` — 7-day plan (Mon–Sun), 3 meal slots each (colazione/pranzo/cena), per-day accordion via `MealCard.vue`, QR share, and "generate shopping list" export
-- `Converter.vue` — real-time food search → select food+method → bidirectional raw↔cooked calculation using yield coefficients from `src/data/conversions.json`
-- `ShoppingList.vue` — checklist with add/remove/check, importable from meal planner
-
-**State & persistence**: No Pinia/Vuex — pages use Vue composables + direct `localStorage` via the wrappers in `src/utils/storage.js` (`save(key, val)` / `load(key, default)`).
-
-**Conversion logic** lives entirely in `src/utils/conversion.js`:
-```js
-rawToCooked(food, method, rawGrams, db) = rawGrams * db[food][method].yield
-cookedToRaw(food, method, cookedGrams, db) = cookedGrams / db[food][method].yield
 ```
-`yield = cooked_weight / raw_weight`. The database in `src/data/conversions.json` has 50+ foods × 1–4 cooking methods with coefficients sourced from CREA, SINU, USDA (see `docs/conversioni.md`).
+lib/
+├── main.dart
+├── app.dart                          # MaterialApp, NavigationBar, AppBar con bottone info
+├── core/
+│   ├── constants/app_constants.dart  # kDayIds, kMealSlots, kStorageKey*, kAppVersion
+│   └── theme/app_theme.dart
+├── shared/
+│   ├── services/storage_service.dart # wrapper SharedPreferences (load/save)
+│   └── widgets/
+├── features/
+│   ├── meal_planner/
+│   │   ├── models/meal_plan.dart         # MealPlan, DayPlan
+│   │   ├── providers/meal_planner_provider.dart
+│   │   ├── qr_codec.dart                 # buildQrPayload, parseMealPlanFromQr
+│   │   └── presentation/
+│   │       ├── pages/meal_planner_page.dart
+│   │       ├── pages/qr_scan_page.dart
+│   │       └── widgets/meal_card.dart, qr_share_sheet.dart
+│   ├── converter/
+│   │   ├── models/conversion_entry.dart  # rawToCooked, cookedToRaw (metodi sul model)
+│   │   ├── providers/converter_provider.dart
+│   │   └── presentation/pages/converter_page.dart
+│   ├── shopping_list/
+│   │   ├── models/shopping_item.dart     # quantity per aggregazione duplicati
+│   │   ├── providers/shopping_list_provider.dart
+│   │   └── presentation/
+│   │       ├── pages/shopping_list_page.dart
+│   │       └── widgets/shopping_item_tile.dart
+│   └── guide/
+│       └── presentation/
+│           ├── pages/guide_page.dart          # 3 tab: Pasti, Converti, Spesa
+│           └── widgets/info_bottom_sheet.dart # aperto dal bottone info in AppBar
+└── assets/data/conversions.json       # 50+ alimenti × metodi cottura
+```
 
-**CSS**: Vanilla CSS only, no framework. Design tokens are CSS variables in `:root` in `src/style.css` (`--color-primary: #2d6a4f`, `--nav-height: 64px`, etc.). Buttons must be min 44px; layout is single-column.
+**State management**: Provider (`ChangeNotifier`).  
+**Persistenza**: `shared_preferences`, chiavi `meals` e `shopping_list` (JSON serializzato).  
+**Conversione**: logica in `ConversionEntry` — `rawToCooked = raw * yieldFactor`, `cookedToRaw = cooked / yieldFactor`.  
+**UI**: Material 3, seed color `Color(0xFF2d6a4f)`, tutto in italiano.  
+**QR**: payload JSON `{ "v": 1, "meals": { ... } }`, limite 2953 byte (capacità QR con error correction L).
 
 ## Testing
 
-- **Unit** (`tests/unit/`): Pure function tests for `conversion.js` and `storage.js`
-- **Integration** (`tests/integration/`): Vue Test Utils component mounts with localStorage seeding
-- **E2E** (`tests/e2e/`): Playwright against the running dev server
+110 test (unit + widget). Non richiedono device fisico.
 
-`tests/setup.js` clears localStorage before/after each test. Vitest uses `happy-dom` environment.
+```
+test/
+├── helpers/pump_app.dart              # estensione pumpApp per widget test
+└── features/
+    ├── converter/
+    │   ├── models/conversion_entry_test.dart
+    │   └── providers/converter_provider_test.dart
+    ├── meal_planner/
+    │   ├── models/meal_plan_test.dart
+    │   ├── providers/meal_planner_provider_test.dart
+    │   ├── widgets/meal_card_test.dart
+    │   └── qr_test.dart
+    └── shopping_list/
+        ├── models/shopping_item_test.dart
+        ├── providers/shopping_list_provider_test.dart
+        └── widgets/shopping_item_tile_test.dart
+```
 
-## Android Build
-
-The Docker pipeline in `docker/` handles the full Android build:
-1. `npm run build` → `dist/`
-2. `cap sync` → copies dist into Android project
-3. Gradle builds the APK; release APK is signed with `docker/biteplan.jks` (gitignored)
-
-See `docker/README.md` for full APK build instructions.
+I test usano `SharedPreferences.setMockInitialValues({})` per isolare lo storage.
