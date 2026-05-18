@@ -28,7 +28,7 @@ App Android per la gestione della dieta quotidiana — pianificazione pasti, con
 
 | Livello | Tecnologia |
 |---|---|
-| Framework | Flutter 3.x / Dart 3.x |
+| Framework | Flutter 3.41.9 / Dart 3.11.5 |
 | State management | Provider |
 | Persistenza | shared_preferences |
 | QR code | qr_flutter + mobile_scanner |
