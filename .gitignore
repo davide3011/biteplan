@@ -3,16 +3,14 @@ dist/
 .DS_Store
 *.jks
 
-# Flutter — output e scaffold generati da flutter create / flutter build
+# Flutter — output di build
 .dart_tool/
 .flutter-plugins
 .flutter-plugins-dependencies
 /build/
 *.g.dart
-pubspec.lock
 
-# Scaffold generato da flutter create (creato nel container, non versionare)
-/android/
+# Piattaforme non usate
 /ios/
 /linux/
 /macos/
