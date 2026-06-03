@@ -66,12 +66,12 @@ I coefficienti di resa riportati nelle tabelle seguenti sono stati ricavati dall
 | Zucchine (fettine) | Forno | 0.72 | derivato: padella 0.76 × k=0.95 (forno simile a padella per fettine) |
 | Spinaci | Bollitura | 0.85 | [CREA crudo](https://www.alimentinutrizione.it/tabelle-nutrizionali/005700) / [CREA cotto](https://www.alimentinutrizione.it/tabelle-nutrizionali/005705) — 35÷41 kcal |
 | Spinaci | Padella | 0.85 | [USDA FNDDS](https://fdc.nal.usda.gov/) fdcId 2709615 — "Spinach, fresh, cooked, no added fat" moisture change −15% |
-| Bieta | Bollitura | 0.83 | [CREA crudo](https://www.alimentinutrizione.it/tabelle-nutrizionali/005080) / [CREA cotto](https://www.alimentinutrizione.it/tabelle-nutrizionali/005085) — 15÷18 kcal |
+| Bieta | Bollitura | 0.86 | [Muzzone 2024](https://www.istitutomuzzone.edu.it/wp-content/uploads/2024/08/Tabelle-conversione-crudo-cotto-2024.pdf) (86g/100g) · [matematicaincucina.it — INRAN](https://www.matematicaincucina.it/peso-alimenti-crudi-e-cotti-guida-alla-conversione/) (86g/100g) |
 | Bieta | Padella | 0.80 | derivato: bollitura 0.83 × k=0.96 (foglie tenere, perdita aggiuntiva moderata) |
 | Broccoli | Bollitura | 0.97 | [CREA crudo](https://www.alimentinutrizione.it/tabelle-nutrizionali/005110) / [CREA cotto](https://www.alimentinutrizione.it/tabelle-nutrizionali/005105) — 33÷34 kcal |
 | Broccoli | Padella | 0.89 | derivato: bollitura 0.97 × k=0.92 (crucifere dense, maggiore evaporazione) |
 | Broccoli | Forno | 0.90 | derivato: padella 0.89 × k=1.01 (forno trattiene lievemente più umidità) |
-| Cavolfiore | Bollitura | 0.97 | [CREA crudo](https://www.alimentinutrizione.it/tabelle-nutrizionali/005160) / [CREA cotto](https://www.alimentinutrizione.it/tabelle-nutrizionali/005165) — 30÷31 kcal |
+| Cavolfiore | Bollitura | 0.93 | [Muzzone 2024](https://www.istitutomuzzone.edu.it/wp-content/uploads/2024/08/Tabelle-conversione-crudo-cotto-2024.pdf) (93g/100g) · [matematicaincucina.it — INRAN](https://www.matematicaincucina.it/peso-alimenti-crudi-e-cotti-guida-alla-conversione/) (93g/100g) |
 | Cavolfiore | Padella | 0.89 | derivato: bollitura 0.97 × k=0.92 (crucifere dense, maggiore evaporazione) |
 | Cavolfiore | Forno | 0.90 | derivato: padella 0.89 × k=1.01 (forno trattiene lievemente più umidità) |
 | Fagiolini | Bollitura | 0.95 | [matematicaincucina.it — INRAN](https://www.matematicaincucina.it/peso-alimenti-crudi-e-cotti-guida-alla-conversione/) |
@@ -83,7 +83,7 @@ I coefficienti di resa riportati nelle tabelle seguenti sono stati ricavati dall
 | Carciofi | Bollitura | 0.75 | [CREA crudo](https://www.alimentinutrizione.it/tabelle-nutrizionali/005120) / [CREA cotto](https://www.alimentinutrizione.it/tabelle-nutrizionali/005125) — 33÷44 kcal |
 | Carciofi | Padella | 0.66 | derivato: bollitura 0.75 × k=0.88 (struttura densa, perdita consistente) |
 | Carciofi | Forno | 0.68 | derivato: padella 0.66 × k=1.03 (forno trattiene umidità per struttura densa) |
-| Finocchi | Bollitura | 0.88 | [CREA crudo](https://www.alimentinutrizione.it/tabelle-nutrizionali/005320) / [CREA cotto](https://www.alimentinutrizione.it/tabelle-nutrizionali/005325) — 15÷17 kcal |
+| Finocchi | Bollitura | 0.86 | [Muzzone 2024](https://www.istitutomuzzone.edu.it/wp-content/uploads/2024/08/Tabelle-conversione-crudo-cotto-2024.pdf) (86g/100g) · [matematicaincucina.it — INRAN](https://www.matematicaincucina.it/peso-alimenti-crudi-e-cotti-guida-alla-conversione/) (86g/100g) |
 | Finocchi | Padella | 0.75 | derivato: bollitura 0.88 × k=0.85 (bulbo aromatico, forte evaporazione) |
 | Finocchi | Forno | 0.78 | derivato: padella 0.75 × k=1.04 (forno gratinati, umidità parzialmente trattenuta) |
 | Porri | Bollitura | 1.00 | [CREA crudo](https://www.alimentinutrizione.it/tabelle-nutrizionali/005650) / [CREA cotto](https://www.alimentinutrizione.it/tabelle-nutrizionali/005655) — 35÷35 kcal |
@@ -105,7 +105,7 @@ I coefficienti di resa riportati nelle tabelle seguenti sono stati ricavati dall
 | Rape | Bollitura | 0.92 | [CREA crudo](https://www.alimentinutrizione.it/tabelle-nutrizionali/005660) / [CREA cotto](https://www.alimentinutrizione.it/tabelle-nutrizionali/005665) — 24÷26 kcal |
 | Rape | Padella | 0.83 | derivato: bollitura 0.92 × k=0.90 (radici, perdita aggiuntiva per calore diretto) |
 | Rape | Forno | 0.85 | derivato: padella 0.83 × k=1.02 (forno trattiene lievemente più umidità) |
-| Agretti | Bollitura | 0.88 | [CREA crudo](https://www.alimentinutrizione.it/tabelle-nutrizionali/005010) / [CREA cotto](https://www.alimentinutrizione.it/tabelle-nutrizionali/005025) — 22÷25 kcal |
+| Agretti | Bollitura | 0.86 | [Muzzone 2024](https://www.istitutomuzzone.edu.it/wp-content/uploads/2024/08/Tabelle-conversione-crudo-cotto-2024.pdf) (86g/100g) · [matematicaincucina.it — INRAN](https://www.matematicaincucina.it/peso-alimenti-crudi-e-cotti-guida-alla-conversione/) (86g/100g) |
 | Agretti | Padella | 0.80 | derivato: bollitura 0.88 × k=0.91 (steli succulenti) |
 | Pollo petto | Bollitura | 0.90 | [nutrizionistadoc.it](https://www.nutrizionistadoc.it/wp-content/uploads/2017/09/Tabella-di-conversione-cibi-crudi-e-cotti.pdf) |
 | Pollo petto | Padella | 0.83 | [istitutomuzzone.edu.it](https://www.istitutomuzzone.edu.it/wp-content/uploads/2024/08/Tabelle-conversione-crudo-cotto-2024.pdf) |
