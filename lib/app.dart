@@ -5,7 +5,7 @@ import 'features/converter/presentation/pages/converter_page.dart';
 import 'features/shopping_list/presentation/pages/shopping_list_page.dart';
 import 'features/guide/presentation/widgets/info_bottom_sheet.dart';
 import 'shared/services/update_service.dart';
-import 'shared/services/url_launcher_service.dart';
+import 'shared/widgets/update_dialog.dart';
 
 class BitePlanApp extends StatelessWidget {
   const BitePlanApp({super.key});
@@ -33,8 +33,6 @@ class _MainScaffoldState extends State<_MainScaffold> {
   late final List<Widget> _pages;
 
   static const _titles = ['Piano Pasti', 'Convertitore', 'Lista della spesa'];
-  static const _releasesUrl =
-      'https://github.com/davide3011/biteplan/releases/latest';
 
   @override
   void initState() {
@@ -48,36 +46,9 @@ class _MainScaffoldState extends State<_MainScaffold> {
     ];
     UpdateService.checkUpdate().then((newVersion) {
       if (newVersion != null && mounted) {
-        _showUpdateDialog(newVersion);
+        showUpdateDialog(context, newVersion);
       }
     });
-  }
-
-  void _showUpdateDialog(String newVersion) {
-    showDialog<void>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        icon: const Icon(Icons.system_update_outlined, size: 32),
-        title: const Text('Aggiornamento disponibile'),
-        content: Text(
-          'È disponibile la versione $newVersion di BitePlan.\n'
-          'Vuoi scaricare il nuovo APK?',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Più tardi'),
-          ),
-          FilledButton(
-            onPressed: () {
-              Navigator.of(ctx).pop();
-              UrlLauncherService.launch(_releasesUrl);
-            },
-            child: const Text('Scarica'),
-          ),
-        ],
-      ),
-    );
   }
 
   @override

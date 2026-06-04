@@ -27,9 +27,19 @@ class UpdateService {
       final body = await response.transform(utf8.decoder).join();
       client.close();
       if (response.statusCode != 200) return null;
-      final data = jsonDecode(body) as Map<String, dynamic>;
-      final tag = (data['tag_name'] as String).replaceFirst(RegExp(r'^v'), '');
+      final tag = parseTagName(body);
+      if (tag == null) return null;
       return isNewer(tag, kAppVersion) ? tag : null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  @visibleForTesting
+  static String? parseTagName(String body) {
+    try {
+      final data = jsonDecode(body) as Map<String, dynamic>;
+      return (data['tag_name'] as String).replaceFirst(RegExp(r'^v'), '');
     } catch (_) {
       return null;
     }
