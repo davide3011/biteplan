@@ -24,6 +24,10 @@ App Android per la gestione della dieta quotidiana — pianificazione pasti, con
 - Separazione visiva tra elementi da completare e completati
 - Rimozione singola e svuota lista con conferma
 
+### Controllo aggiornamenti
+- All'avvio controlla silenziosamente l'ultima release su GitHub
+- Se disponibile una versione più recente, mostra un dialog con link diretto al download dell'APK
+
 ## Stack
 
 | Livello | Tecnologia |
@@ -74,19 +78,24 @@ docker run --rm -v "$(pwd):/workspace" -w /workspace biteplan-build \
 test/
 ├── helpers/
 │   └── pump_app.dart                     # estensione pumpApp per widget test
-└── features/
-    ├── converter/
-    │   ├── models/conversion_entry_test.dart
-    │   └── providers/converter_provider_test.dart
-    ├── meal_planner/
-    │   ├── models/meal_plan_test.dart
-    │   ├── providers/meal_planner_provider_test.dart
-    │   ├── widgets/meal_card_test.dart
-    │   └── qr_test.dart
-    └── shopping_list/
-        ├── models/shopping_item_test.dart
-        ├── providers/shopping_list_provider_test.dart
-        └── widgets/shopping_item_tile_test.dart
+├── features/
+│   ├── converter/
+│   │   ├── models/conversion_entry_test.dart
+│   │   └── providers/converter_provider_test.dart
+│   ├── meal_planner/
+│   │   ├── models/meal_plan_test.dart
+│   │   ├── providers/meal_planner_provider_test.dart
+│   │   ├── widgets/meal_card_test.dart
+│   │   └── qr_test.dart
+│   └── shopping_list/
+│       ├── models/shopping_item_test.dart
+│       ├── providers/shopping_list_provider_test.dart
+│       └── widgets/shopping_item_tile_test.dart
+└── shared/
+    ├── services/
+    │   └── update_service_test.dart      # parsing versione e confronto semver
+    └── widgets/
+        └── update_dialog_test.dart       # widget test dialog aggiornamento
 ```
 
 ## Build APK
