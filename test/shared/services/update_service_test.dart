@@ -2,6 +2,28 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:biteplan/shared/services/update_service.dart';
 
 void main() {
+  group('UpdateService.parseTagName', () {
+    test('strips v prefix from tag_name', () {
+      expect(UpdateService.parseTagName('{"tag_name":"v2.1.0"}'), '2.1.0');
+    });
+
+    test('works without v prefix', () {
+      expect(UpdateService.parseTagName('{"tag_name":"2.1.0"}'), '2.1.0');
+    });
+
+    test('returns null for malformed JSON', () {
+      expect(UpdateService.parseTagName('not json'), isNull);
+    });
+
+    test('returns null when tag_name is missing', () {
+      expect(UpdateService.parseTagName('{"message":"Not Found"}'), isNull);
+    });
+
+    test('returns null for empty body', () {
+      expect(UpdateService.parseTagName(''), isNull);
+    });
+  });
+
   group('UpdateService.parseVersion', () {
     test('parses standard semver', () {
       expect(UpdateService.parseVersion('2.1.3'), [2, 1, 3]);
