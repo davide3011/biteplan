@@ -104,4 +104,15 @@ Premi **Svuota lista** in fondo alla pagina. Viene richiesta conferma prima di p
 
 ## Informazioni app
 
-Tocca il pulsante **ⓘ** in alto a destra per visualizzare la versione dell'app, l'autore e la licenza.
+Tocca il pulsante **ⓘ** in alto a destra per visualizzare la versione dell'app, l'autore e la licenza. La verifica degli aggiornamenti avviene automaticamente all'avvio.
+
+---
+
+## Aggiornamenti
+
+All'avvio l'app verifica automaticamente se è disponibile una nuova versione. Se sì, compare un dialog con il numero della versione disponibile e due opzioni:
+
+- **Scarica** — apre il browser sulla pagina delle release GitHub da cui scaricare il nuovo APK
+- **Più tardi** — chiude il dialog; il controllo verrà ripetuto al prossimo avvio
+
+Il controllo richiede una connessione internet. In assenza di rete viene saltato silenziosamente.

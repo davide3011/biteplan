@@ -68,6 +68,10 @@ class _PastiTab extends StatelessWidget {
               text:
                   'I dati vengono salvati automaticamente sul dispositivo. Non serve premere nessun tasto.'),
         ),
+        const _TipCard(
+          text:
+              'Ad ogni avvio l\'app controlla automaticamente se è disponibile una nuova versione. Se sì, compare un avviso con il pulsante "Scarica" per scaricare l\'aggiornamento.',
+        ),
       ],
     );
   }
