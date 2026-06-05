@@ -7,6 +7,24 @@ il progetto aderisce al [Semantic Versioning](https://semver.org/lang/it/).
 
 ---
 
+## [2.1.0] — 2026-06-05
+
+### Aggiunto
+
+- **Controllo aggiornamenti automatico** — all'avvio l'app verifica silenziosamente se è disponibile una nuova versione su GitHub; se sì, compare un dialog con il numero di versione e il pulsante "Scarica" che apre la pagina delle release nel browser
+
+### Fix
+
+- **Convertitore** — corretti coefficienti di resa bollitura per bieta, cavolfiore, finocchi e agretti (valori precedenti sovrastimati)
+
+### Tecnico
+
+- Aggiunto permesso `INTERNET` e query `ACTION_VIEW` in `AndroidManifest.xml`
+- `MethodChannel` nativo in `MainActivity.kt` per apertura URL senza dipendenze aggiuntive
+- Suite di test estesa da 110 a 130 test (unit test `UpdateService`, widget test dialog aggiornamento)
+
+---
+
 ## [2.0.0] — 2026-05-18
 
 ### Aggiunto
