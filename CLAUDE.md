@@ -84,24 +84,27 @@ lib/
 
 ## Testing
 
-110 test (unit + widget). Non richiedono device fisico.
+130 test (unit + widget). Non richiedono device fisico.
 
 ```
 test/
 ├── helpers/pump_app.dart              # estensione pumpApp per widget test
-└── features/
-    ├── converter/
-    │   ├── models/conversion_entry_test.dart
-    │   └── providers/converter_provider_test.dart
-    ├── meal_planner/
-    │   ├── models/meal_plan_test.dart
-    │   ├── providers/meal_planner_provider_test.dart
-    │   ├── widgets/meal_card_test.dart
-    │   └── qr_test.dart
-    └── shopping_list/
-        ├── models/shopping_item_test.dart
-        ├── providers/shopping_list_provider_test.dart
-        └── widgets/shopping_item_tile_test.dart
+├── features/
+│   ├── converter/
+│   │   ├── models/conversion_entry_test.dart
+│   │   └── providers/converter_provider_test.dart
+│   ├── meal_planner/
+│   │   ├── models/meal_plan_test.dart
+│   │   ├── providers/meal_planner_provider_test.dart
+│   │   ├── widgets/meal_card_test.dart
+│   │   └── qr_test.dart
+│   └── shopping_list/
+│       ├── models/shopping_item_test.dart
+│       ├── providers/shopping_list_provider_test.dart
+│       └── widgets/shopping_item_tile_test.dart
+└── shared/
+    ├── services/update_service_test.dart
+    └── widgets/update_dialog_test.dart
 ```
 
 I test usano `SharedPreferences.setMockInitialValues({})` per isolare lo storage.

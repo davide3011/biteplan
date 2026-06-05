@@ -10,6 +10,9 @@ dist/
 /build/
 *.g.dart
 
+# Generato da flutter create — non appartiene al progetto
+test/widget_test.dart
+
 # Piattaforme non usate
 /ios/
 /linux/

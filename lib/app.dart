@@ -4,6 +4,8 @@ import 'features/meal_planner/presentation/pages/meal_planner_page.dart';
 import 'features/converter/presentation/pages/converter_page.dart';
 import 'features/shopping_list/presentation/pages/shopping_list_page.dart';
 import 'features/guide/presentation/widgets/info_bottom_sheet.dart';
+import 'shared/services/update_service.dart';
+import 'shared/widgets/update_dialog.dart';
 
 class BitePlanApp extends StatelessWidget {
   const BitePlanApp({super.key});
@@ -42,6 +44,11 @@ class _MainScaffoldState extends State<_MainScaffold> {
       const ConverterPage(),
       const ShoppingListPage(),
     ];
+    UpdateService.checkUpdate().then((newVersion) {
+      if (newVersion != null && mounted) {
+        showUpdateDialog(context, newVersion);
+      }
+    });
   }
 
   @override
