@@ -43,13 +43,17 @@ bash docker/build/build.sh --release              # release → dist/biteplan-re
 ```
 lib/
 ├── main.dart
-├── app.dart                          # MaterialApp, NavigationBar, AppBar con bottone info
+├── app.dart                          # MaterialApp, NavigationBar; initState chiama UpdateService.checkUpdate() e mostra showUpdateDialog() se c'è aggiornamento
 ├── core/
 │   ├── constants/app_constants.dart  # kDayIds, kMealSlots, kStorageKey*, kAppVersion
 │   └── theme/app_theme.dart
 ├── shared/
-│   ├── services/storage_service.dart # wrapper SharedPreferences (load/save)
+│   ├── services/
+│   │   ├── storage_service.dart      # wrapper SharedPreferences (load/save)
+│   │   ├── update_service.dart       # checkUpdate() → GitHub API, isNewer(), parseTagName() (@visibleForTesting)
+│   │   └── url_launcher_service.dart # MethodChannel 'com.davide.biteplan/launcher' → Intent.ACTION_VIEW
 │   └── widgets/
+│       └── update_dialog.dart        # showUpdateDialog() — AlertDialog con "Più tardi" / "Scarica"
 ├── features/
 │   ├── meal_planner/
 │   │   ├── models/meal_plan.dart         # MealPlan, DayPlan
@@ -80,7 +84,9 @@ lib/
 **Persistenza**: `shared_preferences`, chiavi `meals` e `shopping_list` (JSON serializzato).  
 **Conversione**: logica in `ConversionEntry` — `rawToCooked = raw * yieldFactor`, `cookedToRaw = cooked / yieldFactor`.  
 **UI**: Material 3, seed color `Color(0xFF2d6a4f)`, tutto in italiano.  
-**QR**: payload JSON `{ "v": 1, "meals": { ... } }`, limite 2953 byte (capacità QR con error correction L).
+**QR**: payload JSON `{ "v": 1, "meals": { ... } }`, limite 2953 byte (capacità QR con error correction L).  
+**Update checker**: `UpdateService.checkUpdate()` usa `dart:io` `HttpClient` (nessun package aggiuntivo); disabilitato su web (`kIsWeb`). Il `MethodChannel` `com.davide.biteplan/launcher` è implementato in `android/app/src/main/kotlin/com/davide/biteplan/MainActivity.kt`.  
+**Widget test con MethodChannel**: usare `TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler` per mockare il canale nei test — vedi `test/shared/widgets/update_dialog_test.dart`.
 
 ## Testing
 
