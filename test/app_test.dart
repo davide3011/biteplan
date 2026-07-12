@@ -8,15 +8,19 @@ import 'package:biteplan/features/converter/providers/converter_provider.dart';
 import 'package:biteplan/features/meal_planner/providers/meal_planner_provider.dart';
 import 'package:biteplan/features/shopping_list/providers/shopping_list_provider.dart';
 
+late MealPlannerProvider _meals;
+late ConverterProvider _converter;
+late ShoppingListProvider _shopping;
+
 Future<void> _pumpApp(WidgetTester tester) async {
   await tester.binding.setSurfaceSize(const Size(800, 1600));
   addTearDown(() => tester.binding.setSurfaceSize(null));
   await tester.pumpWidget(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => MealPlannerProvider()..load()),
-        ChangeNotifierProvider(create: (_) => ConverterProvider()..loadDb()),
-        ChangeNotifierProvider(create: (_) => ShoppingListProvider()..load()),
+        ChangeNotifierProvider.value(value: _meals),
+        ChangeNotifierProvider.value(value: _converter),
+        ChangeNotifierProvider.value(value: _shopping),
       ],
       child: const BitePlanApp(),
     ),
@@ -28,8 +32,18 @@ Finder _appBarTitle(String text) => find.descendant(
     of: find.byType(AppBar), matching: find.text(text));
 
 void main() {
-  setUp(() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
+  // I provider sono creati e caricati nel setUp (fuori dalla zona FakeAsync
+  // di testWidgets): il caricamento async dentro il body può bloccare la suite.
+  setUp(() async {
     SharedPreferences.setMockInitialValues({});
+    _meals = MealPlannerProvider();
+    _converter = ConverterProvider();
+    _shopping = ShoppingListProvider();
+    await _meals.load();
+    await _converter.loadDb();
+    await _shopping.load();
   });
 
   group('BitePlanApp', () {

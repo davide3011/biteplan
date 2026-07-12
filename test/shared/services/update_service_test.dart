@@ -175,5 +175,5 @@ class _FakeHttpClientResponse extends Fake implements HttpClientResponse {
 
   @override
   Stream<S> transform<S>(StreamTransformer<List<int>, S> streamTransformer) =>
-      Stream.value(utf8.encode(body)).transform(streamTransformer);
+      Stream<List<int>>.value(utf8.encode(body)).transform(streamTransformer);
 }

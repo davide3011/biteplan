@@ -15,10 +15,14 @@ const _riso =
     ConversionEntry(food: 'riso', method: 'bollitura', yieldFactor: 3.0);
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
   late ConverterProvider provider;
 
-  setUp(() {
+  // loadDb nel setUp (fuori dalla zona FakeAsync di testWidgets):
+  // caricarlo dentro il body del test può bloccare la suite.
+  setUp(() async {
     provider = ConverterProvider();
+    await provider.loadDb();
   });
 
   group('ConverterPage — ricerca', () {
@@ -28,7 +32,6 @@ void main() {
     });
 
     testWidgets('la ricerca mostra risultati dal database', (tester) async {
-      await provider.loadDb();
       await tester.pumpApp(_page(provider));
       await tester.enterText(find.byType(TextField), 'riso');
       await tester.pump();
@@ -37,7 +40,6 @@ void main() {
 
     testWidgets('ricerca senza corrispondenze mostra "Nessun risultato"',
         (tester) async {
-      await provider.loadDb();
       await tester.pumpApp(_page(provider));
       await tester.enterText(find.byType(TextField), 'xyzabc');
       await tester.pump();
@@ -46,7 +48,6 @@ void main() {
 
     testWidgets('tap su un risultato apre la card di conversione',
         (tester) async {
-      await provider.loadDb();
       await tester.pumpApp(_page(provider));
       await tester.enterText(find.byType(TextField), 'riso');
       await tester.pump();

@@ -35,7 +35,7 @@ void main() {
       await _openSheet(tester);
       await tester.tap(find.text('Apri'));
       await tester.pumpAndSettle();
-      expect(find.text('Aggiungere un alimento'), findsOneWidget);
+      expect(find.text('AGGIUNGERE UN ALIMENTO'), findsOneWidget);
     });
   });
 }
