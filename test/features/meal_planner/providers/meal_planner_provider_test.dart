@@ -60,6 +60,24 @@ void main() {
       expect(provider.plan.days['lunedi']!.pranzo, ['pasta', 'frutta']);
     });
 
+    test('removeItem rimuove dallo slot colazione', () async {
+      final provider = MealPlannerProvider();
+      await provider.load();
+      provider.addItem('lunedi', 'colazione', 'latte');
+      provider.addItem('lunedi', 'colazione', 'caffè');
+      provider.removeItem('lunedi', 'colazione', 0);
+      expect(provider.plan.days['lunedi']!.colazione, ['caffè']);
+    });
+
+    test('removeItem rimuove dallo slot cena', () async {
+      final provider = MealPlannerProvider();
+      await provider.load();
+      provider.addItem('lunedi', 'cena', 'pollo');
+      provider.addItem('lunedi', 'cena', 'verdure');
+      provider.removeItem('lunedi', 'cena', 1);
+      expect(provider.plan.days['lunedi']!.cena, ['pollo']);
+    });
+
     test('clearAll svuota tutti i giorni', () async {
       final provider = MealPlannerProvider();
       await provider.load();

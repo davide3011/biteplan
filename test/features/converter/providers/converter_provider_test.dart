@@ -1,8 +1,12 @@
+import 'dart:convert';
+
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:biteplan/features/converter/providers/converter_provider.dart';
 import 'package:biteplan/features/converter/models/conversion_entry.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
   group('ConverterProvider', () {
     late ConverterProvider provider;
 
@@ -185,6 +189,46 @@ void main() {
         provider.addListener(() => notified = true);
         provider.search('riso');
         expect(notified, true);
+      });
+    });
+
+    group('loadDb()', () {
+      test('carica il database e la ricerca trova alimenti noti', () async {
+        await provider.loadDb();
+        provider.search('riso');
+        expect(provider.results, isNotEmpty);
+        provider.search('pollo');
+        expect(provider.results, isNotEmpty);
+      });
+
+      test('la ricerca è case-insensitive', () async {
+        await provider.loadDb();
+        provider.search('RISO');
+        expect(provider.results, isNotEmpty);
+      });
+
+      test('notifica i listener', () async {
+        var notified = false;
+        provider.addListener(() => notified = true);
+        await provider.loadDb();
+        expect(notified, true);
+      });
+    });
+  });
+
+  group('conversions.json', () {
+    test('ogni metodo di ogni alimento ha uno yield positivo', () async {
+      final raw =
+          await rootBundle.loadString('assets/data/conversions.json');
+      final json = jsonDecode(raw) as Map<String, dynamic>;
+      expect(json, isNotEmpty);
+      json.forEach((food, methods) {
+        (methods as Map).forEach((method, data) {
+          final yield_ = (data as Map)['yield'];
+          expect(yield_, isA<num>(), reason: '$food/$method');
+          expect((yield_ as num).toDouble(), greaterThan(0),
+              reason: '$food/$method');
+        });
       });
     });
   });

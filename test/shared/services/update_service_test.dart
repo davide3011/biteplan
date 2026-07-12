@@ -1,7 +1,50 @@
+import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
+import 'package:biteplan/core/constants/app_constants.dart';
 import 'package:biteplan/shared/services/update_service.dart';
 
 void main() {
+  group('UpdateService.checkUpdate', () {
+    tearDown(() => HttpOverrides.global = null);
+
+    test('ritorna la versione quando il tag remoto è più recente', () async {
+      HttpOverrides.global =
+          _FakeHttpOverrides(body: '{"tag_name":"v99.0.0"}');
+      expect(await UpdateService.checkUpdate(), '99.0.0');
+    });
+
+    test('ritorna null quando il tag remoto è uguale alla versione corrente',
+        () async {
+      HttpOverrides.global =
+          _FakeHttpOverrides(body: '{"tag_name":"v$kAppVersion"}');
+      expect(await UpdateService.checkUpdate(), isNull);
+    });
+
+    test('ritorna null quando il tag remoto è più vecchio', () async {
+      HttpOverrides.global = _FakeHttpOverrides(body: '{"tag_name":"v0.0.1"}');
+      expect(await UpdateService.checkUpdate(), isNull);
+    });
+
+    test('ritorna null con status diverso da 200', () async {
+      HttpOverrides.global = _FakeHttpOverrides(
+          statusCode: 404, body: '{"message":"Not Found"}');
+      expect(await UpdateService.checkUpdate(), isNull);
+    });
+
+    test('ritorna null con body malformato', () async {
+      HttpOverrides.global = _FakeHttpOverrides(body: 'non json');
+      expect(await UpdateService.checkUpdate(), isNull);
+    });
+
+    test('ritorna null se la connessione fallisce', () async {
+      HttpOverrides.global = _FakeHttpOverrides(fail: true);
+      expect(await UpdateService.checkUpdate(), isNull);
+    });
+  });
+
   group('UpdateService.parseTagName', () {
     test('strips v prefix from tag_name', () {
       expect(UpdateService.parseTagName('{"tag_name":"v2.1.0"}'), '2.1.0');
@@ -70,4 +113,67 @@ void main() {
       expect(UpdateService.isNewer('2.10.0', '2.9.0'), isTrue);
     });
   });
+}
+
+// ── Fake HTTP per checkUpdate ────────────────────────────────────────────────
+
+class _FakeHttpOverrides extends HttpOverrides {
+  _FakeHttpOverrides({this.statusCode = 200, this.body = '', this.fail = false});
+  final int statusCode;
+  final String body;
+  final bool fail;
+
+  @override
+  HttpClient createHttpClient(SecurityContext? context) =>
+      _FakeHttpClient(statusCode: statusCode, body: body, fail: fail);
+}
+
+class _FakeHttpClient extends Fake implements HttpClient {
+  _FakeHttpClient(
+      {required this.statusCode, required this.body, required this.fail});
+  final int statusCode;
+  final String body;
+  final bool fail;
+
+  @override
+  set connectionTimeout(Duration? value) {}
+
+  @override
+  Future<HttpClientRequest> getUrl(Uri url) async {
+    if (fail) throw const SocketException('rete assente');
+    return _FakeHttpClientRequest(statusCode: statusCode, body: body);
+  }
+
+  @override
+  void close({bool force = false}) {}
+}
+
+class _FakeHttpClientRequest extends Fake implements HttpClientRequest {
+  _FakeHttpClientRequest({required this.statusCode, required this.body});
+  final int statusCode;
+  final String body;
+
+  @override
+  HttpHeaders get headers => _FakeHttpHeaders();
+
+  @override
+  Future<HttpClientResponse> close() async =>
+      _FakeHttpClientResponse(statusCode: statusCode, body: body);
+}
+
+class _FakeHttpHeaders extends Fake implements HttpHeaders {
+  @override
+  void set(String name, Object value, {bool preserveHeaderCase = false}) {}
+}
+
+class _FakeHttpClientResponse extends Fake implements HttpClientResponse {
+  _FakeHttpClientResponse({required this.statusCode, required this.body});
+
+  @override
+  final int statusCode;
+  final String body;
+
+  @override
+  Stream<S> transform<S>(StreamTransformer<List<int>, S> streamTransformer) =>
+      Stream.value(utf8.encode(body)).transform(streamTransformer);
 }
