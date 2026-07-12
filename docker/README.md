@@ -1,39 +1,12 @@
 # Docker — BitePlan
 
-Due container distinti: uno per lo sviluppo con hot reload, uno per la build APK headless.
+Un solo container, usato per test riproducibili e build APK headless.
+Lo sviluppo (hot reload) avviene sull'host con Flutter + emulatore Android — vedi `CLAUDE.md`.
 Tutti i comandi vanno eseguiti dalla **root del progetto** (`~/biteplan`), non da `docker/`.
 
 ---
 
-## Container dev (`docker/dev/`)
-
-Avvia un web server Flutter accessibile dal browser, con hot reload.
-
-```bash
-cd docker/dev
-docker compose up
-```
-
-Apri **http://localhost:5173** nel browser.
-
-### Hot reload
-
-Con il container attivo, in un altro terminale:
-
-```bash
-docker compose attach dev
-# r → hot reload  |  R → hot restart  |  q → esci
-```
-
-Le modifiche ai file `.dart` sull'host sono visibili subito nel container grazie al volume
-montato — basta premere `r` per ricaricare.
-
-> Prima esecuzione: scarica l'immagine Flutter (~500 MB), richiede 5-10 minuti.
-> Le successive usano la cache Docker e sono molto più rapide.
-
----
-
-## Container build (`docker/build/`)
+## Container build (`docker/`)
 
 Build headless riproducibile per generare l'APK Android.
 
@@ -42,7 +15,7 @@ Build headless riproducibile per generare l'APK Android.
 APK firmato con il debug keystore di Android — adatto per installazione diretta sul dispositivo.
 
 ```bash
-bash docker/build/build.sh
+bash docker/build.sh
 # → dist/biteplan-debug.apk
 ```
 
@@ -83,7 +56,7 @@ aggiungila a `~/.bashrc` o `~/.zshrc`.
 **3. Esegui la build release**
 
 ```bash
-bash docker/build/build.sh --release
+bash docker/build.sh --release
 # → dist/biteplan-release.apk
 ```
 
@@ -107,8 +80,7 @@ adb install dist/biteplan-debug.apk
 
 ## Test
 
-I test non richiedono il container dev — usano l'immagine `biteplan-build`, creata
-automaticamente al primo `bash docker/build/build.sh`.
+I test usano l'immagine `biteplan-build`, creata automaticamente al primo `bash docker/build.sh`.
 
 ```bash
 # Tutti i test (110 test — unit + widget)
@@ -137,17 +109,17 @@ avere Flutter installato sull'host.
 ## Flusso completo
 
 ```
-# 1. Sviluppo
-cd docker/dev && docker compose up
-→ http://localhost:5173   (hot reload con 'r')
+# 1. Sviluppo (host, no Docker — vedi CLAUDE.md)
+emulator -avd biteplan &
+flutter run
 
 # 2. Test
 docker run --rm -v "$(pwd):/workspace" -w /workspace biteplan-build \
   bash -c "flutter pub get && flutter test"
 
 # 3. Build
-bash docker/build/build.sh             # → dist/biteplan-debug.apk
-bash docker/build/build.sh --release   # → dist/biteplan-release.apk
+bash docker/build.sh             # → dist/biteplan-debug.apk
+bash docker/build.sh --release   # → dist/biteplan-release.apk
 
 # 4. Installazione
 adb install dist/biteplan-debug.apk

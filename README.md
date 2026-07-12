@@ -40,27 +40,20 @@ App Android per la gestione della dieta quotidiana — pianificazione pasti, con
 
 ## Sviluppo
 
-Il container dev avvia un web server Flutter accessibile dal browser, con hot reload.
+Sviluppo locale con Flutter installato sull'host e un emulatore Android dedicato — no Docker.
 
 ```bash
-cd docker/dev
-docker compose up
-# → http://localhost:5173
+emulator -avd biteplan &
+flutter run
+# hot reload con "r", hot restart con "R"
 ```
 
-Con il container attivo, in un altro terminale:
-
-```bash
-docker compose attach dev
-# r → hot reload  |  R → hot restart  |  q → esci
-```
-
-Vedi [docker/README.md](docker/README.md) per i dettagli e la build APK.
+Vedi [docker/README.md](docker/README.md) per test e build APK via Docker.
 
 ## Test
 
 La suite copre unit test e widget test. Richiede l'immagine Docker `biteplan-build`
-(creata automaticamente al primo `bash docker/build/build.sh`).
+(creata automaticamente al primo `bash docker/build.sh`).
 
 ```bash
 # Tutti i test (dalla root del progetto)
@@ -101,8 +94,8 @@ test/
 ## Build APK
 
 ```bash
-bash docker/build/build.sh           # debug  → dist/biteplan-debug.apk
-bash docker/build/build.sh --release # release → dist/biteplan-release.apk
+bash docker/build.sh           # debug  → dist/biteplan-debug.apk
+bash docker/build.sh --release # release → dist/biteplan-release.apk
 ```
 
 Vedi [docker/README.md](docker/README.md) per i requisiti della firma release.
