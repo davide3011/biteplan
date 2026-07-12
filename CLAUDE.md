@@ -86,8 +86,10 @@ lib/
 
 ## Testing
 
-130 test unit + widget in `test/` (rispecchia la struttura di `lib/`), più un integration test in `integration_test/app_test.dart`. I test unit/widget non richiedono device.
+184 test unit + widget in `test/` (rispecchia la struttura di `lib/`), più un integration test in `integration_test/app_test.dart`. I test unit/widget non richiedono device. Coverage ~93% su `lib/` (esclusi per scelta: `main.dart`, il percorso camera di `qr_scan_page`).
 
 - Storage isolato con `SharedPreferences.setMockInitialValues({})`
 - Widget test: estensione `pumpApp` in `test/helpers/pump_app.dart`
 - MethodChannel nei test: `TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler` — vedi `test/shared/widgets/update_dialog_test.dart`
+- `test/coverage_helper_test.dart` importa tutta `lib/` così lcov include anche i file a coverage zero — aggiungere i nuovi file lì
+- **Non chiamare** `loadDb()`/`load()` dei provider dentro il body di `testWidgets`: l'async reale nella zona FakeAsync può bloccare la suite (timeout 10 min). Farlo nel `setUp` — vedi `test/features/converter/pages/converter_page_test.dart`
