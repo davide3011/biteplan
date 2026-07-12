@@ -22,3 +22,4 @@ test/widget_test.dart
 /.idea/
 *.iml
 .metadata
+coverage/

@@ -50,6 +50,72 @@ flutter run
 
 Vedi [docker/README.md](docker/README.md) per test e build APK via Docker.
 
+### Requisiti host
+
+- **Linux x86_64** (Ubuntu/Debian o simili; funziona anche su **WSL2** se il kernel espone `/dev/kvm`)
+- **KVM** per l'accelerazione hardware — senza, l'emulatore è inutilizzabile. Verifica con:
+  ```bash
+  ls /dev/kvm          # deve esistere
+  groups | grep kvm    # l'utente deve essere nel gruppo kvm
+  # se manca il gruppo: sudo usermod -aG kvm $USER  (poi rilogin)
+  ```
+- **Java 17+** (`sudo apt install openjdk-21-jdk`)
+- Strumenti di base: `git curl unzip` — e ~15 GB di spazio libero
+
+### Installazione passo passo
+
+**1. Flutter** (versione pinnata `3.41.9`, la stessa di `.flutter-version`):
+
+```bash
+git clone --depth 1 --branch 3.41.9 https://github.com/flutter/flutter.git ~/flutter
+echo 'export PATH="$HOME/flutter/bin:$PATH"' >> ~/.bashrc && source ~/.bashrc
+flutter --version   # al primo avvio scarica il Dart SDK
+```
+
+**2. Android SDK command-line tools:**
+
+```bash
+mkdir -p ~/android-sdk/cmdline-tools
+cd ~/android-sdk/cmdline-tools
+curl -O https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
+unzip commandlinetools-linux-11076708_latest.zip && mv cmdline-tools latest
+rm commandlinetools-linux-11076708_latest.zip
+
+cat >> ~/.bashrc <<'EOF'
+export ANDROID_HOME="$HOME/android-sdk"
+export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH"
+EOF
+source ~/.bashrc
+```
+
+**3. Pacchetti SDK e licenze:**
+
+```bash
+sdkmanager "platform-tools" "emulator" \
+  "platforms;android-34" "build-tools;34.0.0" \
+  "system-images;android-34;google_apis;x86_64"
+yes | sdkmanager --licenses
+```
+
+**4. AVD dedicato al progetto** (Pixel 6, Android 14):
+
+```bash
+echo "no" | avdmanager create avd -n biteplan \
+  -k "system-images;android-34;google_apis;x86_64" -d pixel_6
+```
+
+**5. Verifica e primo avvio:**
+
+```bash
+flutter doctor        # "Android toolchain" deve risultare ✓
+emulator -avd biteplan &
+# attendi il boot (1-2 min al primo avvio), poi dalla root del progetto:
+flutter run
+```
+
+> **Nota WSL2**: serve un kernel con KVM abilitato (WSL2 recenti lo hanno di serie —
+> verifica con `ls /dev/kvm`). La finestra dell'emulatore compare tramite WSLg.
+
 ## Test
 
 La suite copre unit test e widget test. Richiede l'immagine Docker `biteplan-build`
