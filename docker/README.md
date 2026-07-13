@@ -129,7 +129,7 @@ adb install dist/biteplan-debug.apk
 
 ## Note
 
-- App ID: `com.biteplan.biteplan`
+- App ID: `com.davide.biteplan`
 - Android target: API 34
 - Il keystore non viene mai copiato nell'immagine Docker (volume read-only)
 - `dist/` è in `.gitignore`

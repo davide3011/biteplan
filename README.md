@@ -116,6 +116,48 @@ flutter run
 > **Nota WSL2**: serve un kernel con KVM abilitato (WSL2 recenti lo hanno di serie —
 > verifica con `ls /dev/kvm`). La finestra dell'emulatore compare tramite WSLg.
 
+### Installare e testare l'APK di debug sull'emulatore
+
+Una volta creato l'AVD `biteplan` (vedi sopra), per installare e provare un APK di debug
+già buildato (es. `dist/biteplan-debug.apk` generato da `bash docker/build.sh`) senza
+passare da `flutter run`:
+
+**1. Avvia l'emulatore e attendi il boot completo:**
+
+```bash
+emulator -avd biteplan &
+adb wait-for-device
+# poi attendi che il boot sia terminato (può richiedere 1-2 min al primo avvio):
+adb shell 'while [ "$(getprop sys.boot_completed)" != "1" ]; do sleep 1; done'
+```
+
+**2. Installa l'APK:**
+
+```bash
+adb install -r dist/biteplan-debug.apk   # -r = reinstalla sovrascrivendo se già presente
+```
+
+**3. Avvia l'app:**
+
+```bash
+adb shell monkey -p com.davide.biteplan -c android.intent.category.LAUNCHER 1
+```
+
+**4. Osserva i log in tempo reale (utile per debug):**
+
+```bash
+adb logcat --pid=$(adb shell pidof -s com.davide.biteplan)
+```
+
+**5. Disinstalla quando hai finito:**
+
+```bash
+adb uninstall com.davide.biteplan
+```
+
+> Per lo sviluppo iterativo (hot reload) usa invece `flutter run` — questa procedura serve
+> a validare l'APK esatto che verrà distribuito.
+
 ## Test
 
 La suite copre unit test e widget test. Richiede l'immagine Docker `biteplan-build`
