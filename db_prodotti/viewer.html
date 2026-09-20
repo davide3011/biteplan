@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>Catalogo ALDI — visualizzatore</title>
+<style>
+  :root { color-scheme: light dark; }
+  body { font-family: system-ui, sans-serif; margin: 0; padding: 1.5rem; background: #f7f7f5; color: #1a1a1a; }
+  h1 { font-size: 1.25rem; margin: 0 0 0.25rem; }
+  #meta { color: #666; font-size: 0.85rem; margin-bottom: 1rem; }
+  #controls { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1rem; }
+  input, select { padding: 0.4rem 0.6rem; font-size: 0.9rem; border: 1px solid #ccc; border-radius: 6px; }
+  input[type="search"] { flex: 1; min-width: 200px; }
+  #count { font-size: 0.85rem; color: #666; margin-bottom: 0.5rem; }
+  #table-wrap { overflow-x: auto; background: #fff; border-radius: 8px; }
+  table { width: 100%; min-width: 780px; border-collapse: collapse; }
+  th, td { text-align: left; padding: 0.5rem 0.6rem; border-bottom: 1px solid #eee; font-size: 0.9rem; vertical-align: middle; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 260px; }
+  th:nth-child(2), td:nth-child(2) { min-width: 220px; }
+  th:nth-child(6), td:nth-child(6) { white-space: normal; }
+  th { background: #eee; cursor: pointer; user-select: none; position: sticky; top: 0; }
+  th:hover { background: #e2e2e2; }
+  img.thumb { width: 40px; height: 40px; object-fit: contain; border-radius: 4px; background: #f0f0f0; display: block; }
+  tr:hover { background: #fafafa; }
+  a { color: #2d6a4f; }
+  #error { color: #b00020; white-space: pre-wrap; }
+</style>
+</head>
+<body>
+<h1>Catalogo ALDI — visualizzatore</h1>
+<div id="meta">caricamento...</div>
+<div id="controls">
+  <input type="search" id="q" placeholder="Cerca per nome o marca...">
+  <select id="categoria"><option value="">Tutte le categorie</option></select>
+</div>
+<div id="count"></div>
+<div id="error"></div>
+<div id="table-wrap">
+<table id="tabella">
+  <thead>
+    <tr>
+      <th></th>
+      <th data-key="nome">Nome</th>
+      <th data-key="marca">Marca</th>
+      <th data-key="prezzo_num">Prezzo</th>
+      <th data-key="unita_misura">Formato</th>
+      <th data-key="categorie">Categorie</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/sql-wasm.js"></script>
+<script>
+let allRows = [];
+let sortKey = null, sortDir = 1;
+
+function parsePrezzo(testo) {
+  if (!testo) return null;
+  const n = testo.replace(/[^\d,]/g, "").replace(",", ".");
+  return n ? parseFloat(n) : null;
+}
+
+async function main() {
+  const errEl = document.getElementById("error");
+  try {
+    const SQL = await initSqlJs({ locateFile: f => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/${f}` });
+    const buf = await (await fetch("aldi_prodotti.db")).arrayBuffer();
+    const db = new SQL.Database(new Uint8Array(buf));
+
+    const meta = {};
+    db.exec("SELECT chiave, valore FROM metadata")[0]?.values.forEach(([k, v]) => meta[k] = v);
+    const generatoIl = meta.generato_il
+      ? new Date(meta.generato_il).toLocaleString("it-IT", { dateStyle: "long", timeStyle: "short" })
+      : "?";
+    document.getElementById("meta").textContent =
+      `Generato il ${generatoIl} — fonte: ${meta.fonte ?? "?"}`;
+
+    const catStmt = db.exec("SELECT slug, breadcrumb FROM categorie ORDER BY breadcrumb");
+    const catSel = document.getElementById("categoria");
+    (catStmt[0]?.values ?? []).forEach(([slug, breadcrumb]) => {
+      const opt = document.createElement("option");
+      opt.value = slug;
+      opt.textContent = breadcrumb;
+      catSel.appendChild(opt);
+    });
+
+    const res = db.exec(`
+      SELECT p.sku, p.nome, p.marca, p.prezzo_testo, p.unita_misura, p.immagine_url,
+             p.url_prodotto,
+             (SELECT group_concat(c.nome, ', ') FROM prodotto_categorie pc
+              JOIN categorie c ON c.slug = pc.categoria_slug WHERE pc.sku = p.sku) AS categorie,
+             (SELECT group_concat(pc.categoria_slug, ',') FROM prodotto_categorie pc
+              WHERE pc.sku = p.sku) AS categoria_slugs
+      FROM prodotti p
+    `);
+    const cols = res[0].columns;
+    allRows = res[0].values.map(row => {
+      const o = Object.fromEntries(cols.map((c, i) => [c, row[i]]));
+      o.prezzo_num = parsePrezzo(o.prezzo_testo);
+      return o;
+    });
+
+    document.getElementById("q").addEventListener("input", render);
+    catSel.addEventListener("change", render);
+    document.querySelectorAll("th[data-key]").forEach(th => {
+      th.addEventListener("click", () => {
+        const key = th.dataset.key;
+        sortDir = (sortKey === key) ? -sortDir : 1;
+        sortKey = key;
+        render();
+      });
+    });
+
+    render();
+  } catch (e) {
+    errEl.textContent = "Errore nel caricamento del database: " + e.message +
+      "\n\nSe hai aperto questo file direttamente (file://), il browser blocca il fetch " +
+      "del .db per motivi di sicurezza. Avvialo invece con:\n" +
+      "  cd db_prodotti && python3 -m http.server 8000\n" +
+      "e apri http://localhost:8000/viewer.html";
+    document.getElementById("meta").textContent = "";
+  }
+}
+
+function render() {
+  const q = document.getElementById("q").value.trim().toLowerCase();
+  const cat = document.getElementById("categoria").value;
+  let rows = allRows.filter(r =>
+    (!q || (r.nome ?? "").toLowerCase().includes(q) || (r.marca ?? "").toLowerCase().includes(q)) &&
+    (!cat || (r.categoria_slugs ?? "").split(",").includes(cat))
+  );
+  if (sortKey) {
+    rows = rows.slice().sort((a, b) => {
+      const av = a[sortKey] ?? "", bv = b[sortKey] ?? "";
+      return av < bv ? -sortDir : av > bv ? sortDir : 0;
+    });
+  }
+  document.getElementById("count").textContent = `${rows.length} / ${allRows.length} prodotti`;
+
+  const tbody = document.querySelector("#tabella tbody");
+  tbody.innerHTML = "";
+  for (const r of rows) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${r.immagine_url ? `<img class="thumb" src="${r.immagine_url}" loading="lazy" alt="">` : ""}</td>
+      <td><a href="${r.url_prodotto ?? "#"}" target="_blank" rel="noopener">${r.nome ?? ""}</a></td>
+      <td>${r.marca ?? ""}</td>
+      <td>${r.prezzo_testo ?? ""}</td>
+      <td>${r.unita_misura ?? ""}</td>
+      <td>${r.categorie ?? ""}</td>
+    `;
+    tbody.appendChild(tr);
+  }
+}
+
+main();
+</script>
+</body>
+</html>

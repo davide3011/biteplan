@@ -19,6 +19,12 @@ test/widget_test.dart
 /macos/
 /windows/
 /web/
+
+# db_prodotti — dataset generato dallo scraper, rigenerabile con scrape_aldi.py
+db_prodotti/*.db
+db_prodotti/*.json
+db_prodotti/*.log
+db_prodotti/__pycache__/
 /.idea/
 *.iml
 .metadata
