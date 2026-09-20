@@ -2,9 +2,29 @@
 
 App Android per la gestione della dieta quotidiana — pianificazione pasti, conversione crudo/cotto e lista della spesa.
 
-## Funzionalità
+> Un'unica app per pianificare la settimana, sapere quanto pesare crudo o cotto e non dimenticare cosa comprare.
 
-### Piano Pasti
+![License](https://img.shields.io/badge/license-EUPL--1.2-blue)
+![Flutter](https://img.shields.io/badge/flutter-3.41.9-02569B?logo=flutter)
+![Platform](https://img.shields.io/badge/platform-Android-3DDC84?logo=android)
+
+## Overview
+
+BitePlan nasce per unire in un'unica app tre attività che di solito richiedono strumenti
+separati: pianificare i pasti della settimana, convertire i pesi degli alimenti tra crudo e
+cotto (utile per chi segue una dieta con quantità espresse in una delle due forme), e tenere
+una lista della spesa sincronizzata con quanto pianificato.
+
+- **Problema risolto**: evitare di ricalcolare a mano le rese di cottura e di dimenticare
+  ingredienti quando si fa la spesa.
+- **Perché esiste**: progetto personale dell'autore, pensato per un uso quotidiano reale.
+- **Limiti noti**: i coefficienti di resa sono medie indicative (vedi
+  [docs/conversioni.md](docs/conversioni.md)); il piano pasti si condivide tra dispositivi
+  solo via QR code, senza account né sincronizzazione cloud; nessuna build iOS.
+
+## Features
+
+### Piano pasti
 - Pianificazione settimanale su 7 giorni × 3 pasti (colazione, pranzo, cena)
 - Card accordion per giorno, giorno corrente aperto di default
 - Aggiunta e rimozione di voci per ogni pasto
@@ -28,7 +48,32 @@ App Android per la gestione della dieta quotidiana — pianificazione pasti, con
 - All'avvio controlla silenziosamente l'ultima release su GitHub
 - Se disponibile una versione più recente, mostra un dialog con link diretto al download dell'APK
 
-## Stack
+## Architecture
+
+Feature-first sotto `lib/features/`, ognuna con modelli, provider (state management) e
+presentation; persistenza su `SharedPreferences`. Dettaglio del flusso dati per feature in
+[docs/architettura.md](docs/architettura.md).
+
+```text
+biteplan/
+├── lib/
+│   ├── app.dart               # MaterialApp + navigazione
+│   ├── core/                  # costanti, tema
+│   ├── shared/                # servizi e widget condivisi
+│   └── features/
+│       ├── meal_planner/
+│       ├── converter/
+│       ├── shopping_list/
+│       └── guide/
+├── assets/data/conversions.json
+├── android/                   # progetto nativo (MethodChannel in Kotlin)
+├── test/                      # unit + widget test
+├── integration_test/
+├── docs/                      # guida utente, architettura, fonti conversioni
+└── docker/                    # build APK headless, test riproducibili
+```
+
+## Requisiti e dipendenze
 
 | Livello | Tecnologia |
 |---|---|
@@ -38,19 +83,7 @@ App Android per la gestione della dieta quotidiana — pianificazione pasti, con
 | QR code | qr_flutter + mobile_scanner |
 | Build APK | Docker (headless) |
 
-## Sviluppo
-
-Sviluppo locale con Flutter installato sull'host e un emulatore Android dedicato — no Docker.
-
-```bash
-emulator -avd biteplan &
-flutter run
-# hot reload con "r", hot restart con "R"
-```
-
-Vedi [docker/README.md](docker/README.md) per test e build APK via Docker.
-
-### Requisiti host
+Requisiti host per lo sviluppo:
 
 - **Linux x86_64** (Ubuntu/Debian o simili; funziona anche su **WSL2** se il kernel espone `/dev/kvm`)
 - **KVM** per l'accelerazione hardware — senza, l'emulatore è inutilizzabile. Verifica con:
@@ -62,7 +95,7 @@ Vedi [docker/README.md](docker/README.md) per test e build APK via Docker.
 - **Java 17+** (`sudo apt install openjdk-21-jdk`)
 - Strumenti di base: `git curl unzip` — e ~15 GB di spazio libero
 
-### Installazione passo passo
+## Installazione
 
 **1. Flutter** (versione pinnata `3.41.9`, la stessa di `.flutter-version`):
 
@@ -116,104 +149,90 @@ flutter run
 > **Nota WSL2**: serve un kernel con KVM abilitato (WSL2 recenti lo hanno di serie —
 > verifica con `ls /dev/kvm`). La finestra dell'emulatore compare tramite WSLg.
 
-### Installare e testare l'APK di debug sull'emulatore
+## Utilizzo
+
+```bash
+emulator -avd biteplan &
+flutter run
+# hot reload con "r", hot restart con "R"
+```
+
+Per l'uso dell'app una volta installata, vedi la [guida utente](docs/guida-utente.md).
+
+### Installare e testare un APK già buildato
 
 Una volta creato l'AVD `biteplan` (vedi sopra), per installare e provare un APK di debug
 già buildato (es. `dist/biteplan-debug.apk` generato da `bash docker/build.sh`) senza
 passare da `flutter run`:
 
-**1. Avvia l'emulatore e attendi il boot completo:**
-
 ```bash
 emulator -avd biteplan &
 adb wait-for-device
-# poi attendi che il boot sia terminato (può richiedere 1-2 min al primo avvio):
 adb shell 'while [ "$(getprop sys.boot_completed)" != "1" ]; do sleep 1; done'
-```
 
-**2. Installa l'APK:**
-
-```bash
 adb install -r dist/biteplan-debug.apk   # -r = reinstalla sovrascrivendo se già presente
-```
-
-**3. Avvia l'app:**
-
-```bash
 adb shell monkey -p com.davide.biteplan -c android.intent.category.LAUNCHER 1
-```
 
-**4. Osserva i log in tempo reale (utile per debug):**
-
-```bash
+# log in tempo reale
 adb logcat --pid=$(adb shell pidof -s com.davide.biteplan)
-```
 
-**5. Disinstalla quando hai finito:**
-
-```bash
+# disinstalla quando hai finito
 adb uninstall com.davide.biteplan
 ```
 
-> Per lo sviluppo iterativo (hot reload) usa invece `flutter run` — questa procedura serve
-> a validare l'APK esatto che verrà distribuito.
+> Per lo sviluppo iterativo (hot reload) usa `flutter run` — questa procedura serve a
+> validare l'APK esatto che verrà distribuito.
 
 ## Test
 
-La suite copre unit test e widget test. Richiede l'immagine Docker `biteplan-build`
-(creata automaticamente al primo `bash docker/build.sh`).
-
 ```bash
-# Tutti i test (dalla root del progetto)
-docker run --rm -v "$(pwd):/workspace" -w /workspace biteplan-build \
-  bash -c "flutter pub get && flutter test"
+flutter test                                            # tutta la suite (host)
+flutter test test/features/meal_planner/qr_test.dart    # singolo file
 
-# Un singolo file
+# versione riproducibile via Docker (immagine biteplan-build, creata al primo bash docker/build.sh)
 docker run --rm -v "$(pwd):/workspace" -w /workspace biteplan-build \
-  bash -c "flutter test test/features/meal_planner/qr_test.dart"
+  bash -c "flutter pub get --enforce-lockfile && flutter test"
 ```
 
-### Struttura
+Struttura di `test/` (rispecchia `lib/`):
 
-```
+```text
 test/
-├── helpers/
-│   └── pump_app.dart                     # estensione pumpApp per widget test
+├── helpers/pump_app.dart                 # estensione pumpApp per widget test
 ├── features/
-│   ├── converter/
-│   │   ├── models/conversion_entry_test.dart
-│   │   └── providers/converter_provider_test.dart
-│   ├── meal_planner/
-│   │   ├── models/meal_plan_test.dart
-│   │   ├── providers/meal_planner_provider_test.dart
-│   │   ├── widgets/meal_card_test.dart
-│   │   └── qr_test.dart
-│   └── shopping_list/
-│       ├── models/shopping_item_test.dart
-│       ├── providers/shopping_list_provider_test.dart
-│       └── widgets/shopping_item_tile_test.dart
-└── shared/
-    ├── services/
-    │   └── update_service_test.dart      # parsing versione e confronto semver
-    └── widgets/
-        └── update_dialog_test.dart       # widget test dialog aggiornamento
+│   ├── converter/{models,providers}/
+│   ├── meal_planner/{models,providers,widgets}/ + qr_test.dart
+│   └── shopping_list/{models,providers,widgets}/
+└── shared/{services,widgets}/
 ```
 
 ## Build APK
 
 ```bash
-bash docker/build.sh           # debug  → dist/biteplan-debug.apk
-bash docker/build.sh --release # release → dist/biteplan-release.apk
+bash docker/build.sh                        # debug   → dist/biteplan-debug.apk
+export BITEPLAN_KEYSTORE_PASS=password      # richiesto solo per --release
+bash docker/build.sh --release              # release → dist/biteplan-release.apk
 ```
 
-Vedi [docker/README.md](docker/README.md) per i requisiti della firma release.
+Vedi [docker/README.md](docker/README.md) per i requisiti della firma release (keystore).
+
+## Contribuire
+
+Progetto personale mantenuto da un singolo autore, senza processo di contribuzione formale.
+Segnalazioni di bug e proposte sono benvenute via [Issues](https://github.com/davide3011/biteplan/issues);
+per modifiche più ampie apri prima una issue di discussione prima di lavorare a una PR.
 
 ## Documentazione
 
 - [Guida utente](docs/guida-utente.md)
+- [Architettura](docs/architettura.md)
 - [Fonti e documentazione conversioni](docs/conversioni.md)
 - [Changelog](CHANGELOG.md)
 
-## Licenza
+## Stato e licenza
 
-[EUPL v1.2](LICENSE) — Davide Grilli
+Versione corrente: vedi [pubspec.yaml](pubspec.yaml) e [CHANGELOG.md](CHANGELOG.md).
+Distribuito come APK firmato tramite le [release GitHub](https://github.com/davide3011/biteplan/releases);
+l'app verifica automaticamente la disponibilità di aggiornamenti all'avvio.
+
+Rilasciato sotto licenza [EUPL v1.2](LICENSE) — Davide Grilli.

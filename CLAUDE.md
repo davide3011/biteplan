@@ -55,6 +55,7 @@ bash docker/build.sh --release              # release → dist/biteplan-release.
 - **Keystore**: `docker/biteplan.jks` è in `.gitignore`; da ottenere dall'autore o generare con `keytool`. Password via `BITEPLAN_KEYSTORE_PASS` (mai hardcoded); alias: `biteplan`
 - **applicationId**: `com.davide.biteplan` — non cambiare, garantisce aggiornamento diretto dalla v1.2.1
 - **versionCode**: letto da `pubspec.yaml` (`version: X.Y.Z+BUILD`); BUILD deve essere sempre crescente
+- **kAppVersion**: `lib/core/constants/app_constants.dart` duplica la versione di `pubspec.yaml` a mano (nessuna sincronizzazione automatica) — aggiornarla ad ogni bump di versione, altrimenti l'update checker confronta contro il valore sbagliato
 
 ## Architettura
 
@@ -64,6 +65,7 @@ Feature-first sotto `lib/features/` (meal_planner, converter, shopping_list, gui
 lib/
 ├── app.dart                          # MaterialApp + NavigationBar; in initState chiama UpdateService.checkUpdate() e mostra showUpdateDialog()
 ├── core/constants/app_constants.dart # kDayIds, kMealSlots, kStorageKey*, kAppVersion
+├── core/theme/app_theme.dart          # ThemeData Material 3, seed color 0xFF2d6a4f
 ├── shared/
 │   ├── services/storage_service.dart      # wrapper SharedPreferences (load/save)
 │   ├── services/update_service.dart       # checkUpdate() → GitHub API; isNewer(), parseTagName() (@visibleForTesting)
