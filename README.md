@@ -185,6 +185,8 @@ adb uninstall com.davide.biteplan
 
 ## Test
 
+Cosa è coperto, cosa no e insidie note: [docs/testing.md](docs/testing.md).
+
 ```bash
 flutter test                                            # tutta la suite (host)
 flutter test test/features/meal_planner/qr_test.dart    # singolo file
@@ -227,6 +229,8 @@ per modifiche più ampie apri prima una issue di discussione prima di lavorare a
 - [Guida utente](docs/guida-utente.md)
 - [Architettura](docs/architettura.md)
 - [Fonti e documentazione conversioni](docs/conversioni.md)
+- [Emulatore Android — installazione e uso](docs/emulatore.md)
+- [Test — cosa è coperto e come lanciarli](docs/testing.md)
 - [Changelog](CHANGELOG.md)
 
 ## Stato e licenza

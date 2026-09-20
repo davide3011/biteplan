@@ -47,6 +47,7 @@ bash docker/build.sh --release              # release → dist/biteplan-release.
 - **Emulatore**: Android SDK in `/home/davide/android-sdk`; accelerazione hardware via `/dev/kvm` (WSL2 con KVM abilitato).
 - **AVD `biteplan`**: dedicato a questo progetto (Pixel 6, Android 14, google_apis/x86_64). Non riutilizzare AVD di altri progetti (es. `palladium_wallet`).
 - **Permessi**: le build Docker girano come root nel volume montato — se `.dart_tool/` o `build/` risultano di proprietà root, serve `sudo chown -R davide:davide .dart_tool build` prima di usare flutter da host.
+- **Setup e uso dell'emulatore Android** (installazione SDK, creazione AVD, comandi `adb`, troubleshooting): [docs/emulatore.md](docs/emulatore.md).
 
 ## Build e firma
 
@@ -88,7 +89,7 @@ lib/
 
 ## Testing
 
-184 test unit + widget in `test/` (rispecchia la struttura di `lib/`), più un integration test in `integration_test/app_test.dart`. I test unit/widget non richiedono device. Coverage ~93% su `lib/` (esclusi per scelta: `main.dart`, il percorso camera di `qr_scan_page`).
+184 test unit + widget in `test/` (rispecchia la struttura di `lib/`), più un integration test in `integration_test/app_test.dart`. I test unit/widget non richiedono device. Coverage ~93% su `lib/` (esclusi per scelta: `main.dart`, il percorso camera di `qr_scan_page`). Dettaglio di cosa è coperto/escluso e come lanciare la suite: [docs/testing.md](docs/testing.md).
 
 - Storage isolato con `SharedPreferences.setMockInitialValues({})`
 - Widget test: estensione `pumpApp` in `test/helpers/pump_app.dart`
